@@ -1,0 +1,48 @@
+# =======================================
+# ARCHIVOS Y CARPETAS DE PYTHON
+# =======================================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# =======================================
+# ENTORNOS VIRTUALES
+# =======================================
+env/
+venv/
+.venv/
+
+# =======================================
+# MIGRACIONES DE DJANGO
+# =======================================
+**/migrations/
+
+# =======================================
+# ARCHIVOS DE CONFIGURACIÓN/SECRETOS
+# =======================================
+*.sqlite3
+db.sqlite3
+.env
+*.log
+
+# =======================================
+# ARCHIVOS DE EDITORES
+# =======================================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =======================================
+# ARCHIVOS DE SISTEMA
+# =======================================
+.DS_Store
+Thumbs.db
+
+#ignorando carpeta media se guardan los archivos subidos por el usuario
+media/
+
+# Ignorar documentación generada automáticamente (solo es prueba)
+API_ENDPOINTS.md
