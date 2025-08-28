@@ -13,6 +13,7 @@ djangorestframework==3.16.1
 # AUTENTICACIÓN Y PERMISOS
 # ========================================
 django-guardian==2.4.0
+djangorestframework-simplejwt==5.3.1   # JWT para DRF
 
 # ========================================
 # FILTROS Y BÚSQUEDA
@@ -35,8 +36,6 @@ pytz==2024.1
 # BASE DE DATOS
 # ========================================
 # SQLite (incluido con Python)
-# Para PostgreSQL (opcional)
-# psycopg2-binary==2.9.9
 
 # ========================================
 # SERIALIZACIÓN Y API
@@ -70,10 +69,10 @@ pytz==2024.1
 # PRODUCCIÓN
 # ========================================
 # Para servir archivos estáticos
-# whitenoise==6.6.0
+whitenoise==6.6.0
 
 # Para Gunicorn (servidor WSGI)
-# gunicorn==21.2.0
+gunicorn==21.2.0
 
 # ========================================
 # DOCUMENTACIÓN
@@ -97,7 +96,7 @@ pytz==2024.1
 # UTILIDADES ADICIONALES
 # ========================================
 # Para manejo de archivos
-# Pillow==10.1.0
+Pillow==10.1.0
 
 # Para compresión
 # django-compressor==4.4
@@ -113,7 +112,6 @@ pytz==2024.1
 # - django-filter 24.1 (Filtros avanzados)
 #
 # LIBRERÍAS OPCIONALES (comentadas):
-# - Para base de datos PostgreSQL
 # - Para CORS (si se necesita frontend)
 # - Para testing avanzado
 # - Para documentación automática
@@ -136,3 +134,15 @@ pytz==2024.1
 # Versión: 2.0 - Integración Completa
 # Fecha: 21 de Agosto, 2025
 # Estado: ✅ Activo, Funcional e Integrado
+
+# ========================================
+# REPORTES / PDF
+# ========================================
+django-xhtml2pdf==0.0.4
+# (django-xhtml2pdf trae xhtml2pdf y depende de reportlab; Pillow ya lo tienes)
+
+# ========================================
+# REPORTES / EXCEL
+# ========================================
+XlsxWriter==3.2.0
+whitenoise

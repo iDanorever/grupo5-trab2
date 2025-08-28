@@ -1,0 +1,26 @@
+services:
+  web:
+    build: .
+    container_name: reflexo_backend
+    ports:
+      - "8000:8000"
+    environment: {}
+    volumes:
+      # monta el código local dentro del contenedor
+      - .:/app
+      # monta la base de datos local para que docker use la misma
+      - ./db.sqlite3:/app/db.sqlite3
+      # monta los archivos estáticos y media
+      - static_data:/app/staticfiles
+      - media_data:/app/media
+    healthcheck:
+      test: ["CMD", "sh", "-c", "nc -z 127.0.0.1 8000"]
+      interval: 10s
+      timeout: 2s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  static_data:
+  media_data:
