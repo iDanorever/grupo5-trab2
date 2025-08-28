@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+*.sqlite3
+*.db
+.env
+.env.*
+.git
+.gitignore
+.mypy_cache/
+.pytest_cache/
+.cache/
+dist/
+build/
+node_modules/
+staticfiles/
+media/
