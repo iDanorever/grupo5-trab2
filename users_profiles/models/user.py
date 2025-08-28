@@ -29,13 +29,7 @@ class User(AbstractUser):
         on_delete=models.PROTECT,
         verbose_name="Tipo de documento"
     )
-    country = models.ForeignKey(
-        'ubicaciones.Country',  # Ajusta según tu app de países
-        on_delete=models.PROTECT,
-        blank=True, null=True,
-        verbose_name="País"
-    )
-    
+
     # Campos de control
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creado en")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Actualizado en")
