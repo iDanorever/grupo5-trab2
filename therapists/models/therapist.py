@@ -1,19 +1,8 @@
 from django.db import models
-from ubi_geo.models import Region
-from ubi_geo.models import Province
-from ubi_geo.models import District
-
+from ubi_geo.models import Region, Province, District
+from histories_configurations.models import DocumentType
 
 class Therapist(models.Model):
-    # Opciones de documentos
-    DOCUMENT_TYPES = [
-        ('DNI', 'DNI'),
-        ('CE', 'Carné de Extranjería'),
-        ('PTP', 'PTP'),
-        ('CR', 'Carné de Refugiado'),
-        ('PAS', 'Pasaporte'),
-    ]
-
     GENDERS = [
         ('M', 'Masculino'),
         ('F', 'Femenino'),
@@ -25,8 +14,12 @@ class Therapist(models.Model):
         (False, 'Inactivo'),
     ]
 
-    # Datos personales
-    document_type = models.CharField(max_length=10, choices=DOCUMENT_TYPES)
+    # Datos personales - Reemplazar por ForeignKey
+    document_type = models.ForeignKey(
+        DocumentType, 
+        on_delete=models.PROTECT,
+        verbose_name="Tipo de documento"
+    )
     document_number = models.CharField(max_length=20, unique=True)
     last_name_paternal = models.CharField(max_length=100)
     last_name_maternal = models.CharField(max_length=100, blank=True, null=True)
@@ -57,3 +50,8 @@ class Therapist(models.Model):
     
     def __str__(self):
         return self.get_full_name()
+
+    class Meta:
+        # Opcional: puedes agregar metadatos adicionales
+        verbose_name = "Terapeuta"
+        verbose_name_plural = "Terapeutas"

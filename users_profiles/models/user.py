@@ -1,99 +1,73 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.core.validators import RegexValidator
-
+from django.utils import timezone
 
 class User(AbstractUser):
-    """
-    Modelo de usuario personalizado que extiende AbstractUser
-    Incluye campos adicionales para el perfil del usuario
-    """
+    # Campos críticos de autenticación
+    document_number = models.CharField(max_length=20, unique=True, verbose_name="Número de documento")
+    email = models.EmailField(unique=True, verbose_name="Correo electrónico")
+    user_name = models.CharField(max_length=50, unique=True, verbose_name="Nombre de usuario")
     
-    # Campos adicionales para el perfil
-    profile_photo = models.ImageField(
-        upload_to='profile_photos/',
-        null=True,
-        blank=True,
-        verbose_name='Foto de Perfil'
+    # Campos personales
+    photo_url = models.URLField(blank=True, null=True, verbose_name="URL de foto")
+    name = models.CharField(max_length=100, verbose_name="Nombres")
+    paternal_lastname = models.CharField(max_length=100, verbose_name="Apellido paterno")
+    maternal_lastname = models.CharField(max_length=100, verbose_name="Apellido materno")
+    sex = models.CharField(max_length=1, choices=[('M', 'Masculino'), ('F', 'Femenino'), ('O', 'Otro')], verbose_name="Sexo")
+    phone = models.CharField(max_length=15, blank=True, null=True, verbose_name="Teléfono")
+    
+    # Campos de seguridad y verificación
+    password_change = models.BooleanField(default=False, verbose_name="Requiere cambio de contraseña")
+    last_session = models.DateTimeField(blank=True, null=True, verbose_name="Última sesión")
+    account_statement = models.CharField(max_length=20, default='active', verbose_name="Estado de cuenta")
+    email_verified_at = models.DateTimeField(blank=True, null=True, verbose_name="Email verificado en")
+    remember_token = models.CharField(max_length=100, blank=True, null=True, verbose_name="Token de recordatorio")
+    
+    # Relaciones FK (asumiendo que existen estos modelos)
+    document_type = models.ForeignKey(
+        'histories_configurations.DocumentType',
+        on_delete=models.PROTECT,
+        verbose_name="Tipo de documento"
+    )
+    country = models.ForeignKey(
+        'ubicaciones.Country',  # Ajusta según tu app de países
+        on_delete=models.PROTECT,
+        blank=True, null=True,
+        verbose_name="País"
     )
     
-    # Validación para el teléfono
-    phone_regex = RegexValidator(
-        regex=r'^\+?1?\d{9,15}$',
-        message="El número de teléfono debe estar en formato: '+999999999'. Hasta 15 dígitos permitidos."
-    )
+    # Campos de control
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creado en")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Actualizado en")
+    deleted_at = models.DateTimeField(blank=True, null=True, verbose_name="Eliminado en")
     
-    phone_number = models.CharField(
-        validators=[phone_regex],
-        max_length=17,
-        null=True,
-        blank=True,
-        verbose_name='Número de Teléfono'
-    )
+    # Configuración de autenticación
+    USERNAME_FIELD = 'email'  # Se autentica por email
+    REQUIRED_FIELDS = ['user_name', 'document_number']  # Campos requeridos para createsuperuser
     
-    # Campos de verificación
-    email_verified = models.BooleanField(
-        default=False,
-        verbose_name='Email Verificado'
-    )
-    
-    # Campos de fecha
-    date_of_birth = models.DateField(
-        null=True,
-        blank=True,
-        verbose_name='Fecha de Nacimiento'
-    )
-    
-    # Campos de ubicación
-    country = models.CharField(
-        max_length=100,
-        null=True,
-        blank=True,
-        verbose_name='País'
-    )
-    
-    city = models.CharField(
-        max_length=100,
-        null=True,
-        blank=True,
-        verbose_name='Ciudad'
-    )
-    
-    # Campos de redes sociales
-    website = models.URLField(
-        null=True,
-        blank=True,
-        verbose_name='Sitio Web'
-    )
-    
-    bio = models.TextField(
-        max_length=500,
-        null=True,
-        blank=True,
-        verbose_name='Biografía'
-    )
-    
-    # Configuración del modelo
     class Meta:
+        db_table = 'users'  # Para mantener el nombre de tu tabla
         verbose_name = 'Usuario'
         verbose_name_plural = 'Usuarios'
-        db_table = 'users'
     
     def __str__(self):
-        return self.username
+        return f"{self.name} {self.paternal_lastname} - {self.document_number}"
+    
+    def soft_delete(self):
+        """Soft delete del usuario"""
+        self.deleted_at = timezone.now()
+        self.save(update_fields=['deleted_at'])
+    
+    def restore(self):
+        """Restaurar usuario eliminado"""
+        self.deleted_at = None
+        self.save(update_fields=['deleted_at'])
     
     def get_full_name(self):
-        """Retorna el nombre completo del usuario"""
-        if self.first_name and self.last_name:
-            return f"{self.first_name} {self.last_name}"
-        return self.username
+        """Nombre completo"""
+        return f"{self.name} {self.paternal_lastname} {self.maternal_lastname}"
     
-    def has_profile_photo(self):
-        """Verifica si el usuario tiene una foto de perfil"""
-        return bool(self.profile_photo)
-    
-    def get_profile_photo_url(self):
-        """Retorna la URL de la foto de perfil o None"""
-        if self.profile_photo:
-            return self.profile_photo.url
-        return None
+    def verify_email(self):
+        """Marca el email como verificado"""
+        self.email_verified_at = timezone.now()
+        self.save(update_fields=['email_verified_at'])
