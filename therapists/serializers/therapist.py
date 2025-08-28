@@ -4,12 +4,15 @@ from rest_framework import serializers
 from therapists.models import Therapist 
 from ubi_geo.models import Region, Province, District
 from ubi_geo.serializers import RegionSerializer, ProvinceSerializer, DistrictSerializer
+from histories_configurations.models import DocumentType
+from histories_configurations.serializers import DocumentTypeSerializer
 
 class TherapistSerializer(serializers.ModelSerializer):
-    # Serializadores anidados para mostrar datos completos de ubicaciones
+    # Serializadores anidados para mostrar datos completos
     region_fk = RegionSerializer(read_only=True)
     province_fk = ProvinceSerializer(read_only=True)
     district_fk = DistrictSerializer(read_only=True)
+    document_type = DocumentTypeSerializer(read_only=True)  # Para lectura
     
     # Campos para escritura (crear/actualizar)
     region_fk_id = serializers.PrimaryKeyRelatedField(
@@ -33,6 +36,14 @@ class TherapistSerializer(serializers.ModelSerializer):
         required=False,
         write_only=True
     )
+    document_type_id = serializers.PrimaryKeyRelatedField(
+        queryset=DocumentType.objects.all(),
+        source='document_type',
+        write_only=True,
+        error_messages={
+            'does_not_exist': 'El tipo de documento seleccionado no existe.'
+        }
+    )
 
     class Meta:
         model = Therapist
@@ -53,7 +64,7 @@ class TherapistSerializer(serializers.ModelSerializer):
         province_fk debe pertenecer a region_fk
         district_fk debe pertenecer a province_fk
         """
-        region   = attrs.get("region_fk")   or getattr(self.instance, "region_fk", None)
+        region = attrs.get("region_fk") or getattr(self.instance, "region_fk", None)
         province = attrs.get("province_fk") or getattr(self.instance, "province_fk", None)
         district = attrs.get("district_fk") or getattr(self.instance, "district_fk", None)
 
@@ -68,9 +79,26 @@ class TherapistSerializer(serializers.ModelSerializer):
         return attrs
 
     def validate_document_number(self, value):
-        doc_type = self.initial_data.get("document_type")
+        # Obtener el tipo de documento desde los datos iniciales o la instancia
+        doc_type_id = self.initial_data.get("document_type_id")
+        
+        # Si no está en initial_data, intentar obtener de la instancia existente
+        if not doc_type_id and self.instance:
+            doc_type_id = self.instance.document_type_id
+        
+        if not doc_type_id:
+            return value  # No podemos validar sin tipo de documento
+        
+        # Obtener el nombre del tipo de documento para las validaciones
+        try:
+            document_type = DocumentType.objects.get(id=doc_type_id)
+            doc_type_name = document_type.name.upper()
+        except DocumentType.DoesNotExist:
+            # La validación de existencia se hará en document_type_id field
+            return value
 
-        if doc_type == "DNI":
+        # Validaciones según el tipo de documento
+        if doc_type_name == "DNI":
             if not value.isdigit():
                 raise serializers.ValidationError("El DNI debe contener solo números.")
             if not (8 <= len(value) <= 9):
@@ -78,7 +106,7 @@ class TherapistSerializer(serializers.ModelSerializer):
                     "El DNI debe tener entre 8 y 9 dígitos."
                 )
 
-        elif doc_type == "CE":
+        elif doc_type_name == "CE" or "CARNE DE EXTRANJERIA" in doc_type_name:
             if not value.isdigit():
                 raise serializers.ValidationError(
                     "El Carné de Extranjería debe contener solo números."
@@ -88,7 +116,7 @@ class TherapistSerializer(serializers.ModelSerializer):
                     "El Carné de Extranjería debe tener máximo 12 dígitos."
                 )
 
-        elif doc_type == "PTP":
+        elif doc_type_name == "PTP":
             if not value.isdigit():
                 raise serializers.ValidationError("El PTP debe contener solo números.")
             if len(value) != 9:
@@ -96,13 +124,13 @@ class TherapistSerializer(serializers.ModelSerializer):
                     "El PTP debe tener exactamente 9 dígitos."
                 )
 
-        elif doc_type == "CR":
+        elif doc_type_name == "CR" or "CARNE DE REFUGIADO" in doc_type_name:
             if not re.match(r"^[A-Za-z0-9]+$", value):
                 raise serializers.ValidationError(
                     "El Carné de Refugiado debe contener solo letras y números."
                 )
 
-        elif doc_type == "PAS":
+        elif doc_type_name == "PAS" or "PASAPORTE" in doc_type_name:
             if not re.match(r"^[A-Za-z0-9]+$", value):
                 raise serializers.ValidationError(
                     "El Pasaporte debe contener solo letras y números."
@@ -121,7 +149,8 @@ class TherapistSerializer(serializers.ModelSerializer):
         return value
 
     def validate_last_name_maternal(self, value):
-        if not value.strip():
+        # Este campo puede ser null/blank, pero si tiene valor debe ser válido
+        if value and not value.strip():
             raise serializers.ValidationError("El apellido materno no puede estar vacío.")
         return value
 
@@ -148,52 +177,6 @@ class TherapistSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("El correo debe ser válido y terminar en @gmail.com (ejemplo: usuario@gmail.com).")
         return value
 
-    def validate_country(self, value):
-        if value and not re.match(r"^[A-Za-z0-9\s]+$", value):
-            raise serializers.ValidationError(
-                "El país solo puede contener letras y números."
-            )
-        return value
-
-    def validate_department(self, value):
-        if value and not re.match(r"^[A-Za-z0-9\s]+$", value):
-            raise serializers.ValidationError(
-                "El departamento solo puede contener letras y números."
-            )
-        return value
-
-    def validate_province(self, value):
-        if value and not re.match(r"^[A-Za-z0-9\s]+$", value):
-            raise serializers.ValidationError(
-                "La provincia solo puede contener letras y números."
-            )
-        return value
-
-    def validate_district(self, value):
-        if value and not re.match(r"^[A-Za-z0-9\s]+$", value):
-            raise serializers.ValidationError(
-                "El distrito solo puede contener letras y números."
-            )
-        return value
-
-    def validate_address(self, value):
-        if value and not re.match(r"^[A-Za-z0-9\s,.-]+$", value):
-            raise serializers.ValidationError(
-                "La dirección solo puede contener letras, números y símbolos básicos (,.-)."
-            )
-        return value
-
-    def validate_profile_picture(self, value):
-        if not value:
-            return value
-        valid_extensions = ["png", "jpg", "jpeg"]
-        ext = str(value).split(".")[-1].lower()
-        if ext not in valid_extensions:
-            raise serializers.ValidationError(
-                "La imagen debe estar en formato PNG, JPG o JPEG."
-            )
-        return value
-
     def validate_birth_date(self, value):
         today = date.today()
 
@@ -206,4 +189,15 @@ class TherapistSerializer(serializers.ModelSerializer):
         if age < 18:
             raise serializers.ValidationError("El terapeuta debe tener al menos 18 años.")
 
+        return value
+
+    def validate_profile_picture(self, value):
+        if not value:
+            return value
+        valid_extensions = ["png", "jpg", "jpeg"]
+        ext = str(value).split(".")[-1].lower()
+        if ext not in valid_extensions:
+            raise serializers.ValidationError(
+                "La imagen debe estar en formato PNG, JPG o JPEG."
+            )
         return value
