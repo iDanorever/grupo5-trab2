@@ -1,8 +1,14 @@
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+# Django Core
 from django.contrib.auth import get_user_model
-from ..models import UserVerificationCode
+
+# Modelos locales
+from models.user_verification_code import UserVerificationCode
+
+# Serializadores locales
 from ..serializers.verification import (
     VerificationCodeSerializer, EmailChangeSerializer,
     EmailChangeConfirmSerializer, VerificationCodeRequestSerializer,
@@ -10,7 +16,6 @@ from ..serializers.verification import (
 )
 
 User = get_user_model()
-
 
 class VerificationCodeView(APIView):
     """Vista para solicitar códigos de verificación"""
@@ -44,6 +49,75 @@ class VerificationCodeView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class VerificationCodeResendView(APIView):
+    """Vista para reenviar códigos de verificación"""
+    
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def post(self, request):
+        """Reenvía un código de verificación"""
+        serializer = VerificationCodeResendSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            verification_type = serializer.validated_data['verification_type']
+            target_email = serializer.validated_data.get('target_email')
+            
+            # Invalidar códigos anteriores
+            UserVerificationCode.objects.filter(
+                user=request.user,
+                verification_type=verification_type,
+                is_used=False
+            ).update(is_used=True)
+            
+            # Crear nuevo código
+            verification_code = UserVerificationCode.create_code(
+                user=request.user,
+                verification_type=verification_type,
+                target_email=target_email
+            )
+            
+            # Aquí se enviaría el email con el código
+            # Por ahora solo retornamos el código en la respuesta
+            
+            return Response({
+                'message': 'Nuevo código de verificación enviado exitosamente',
+                'code': verification_code.code,  # Solo en desarrollo
+                'expires_at': verification_code.expires_at
+            }, status=status.HTTP_200_OK)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class VerificationStatusView(APIView):
+    """Vista para obtener el estado de verificación del usuario"""
+    
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get(self, request):
+        """Retorna el estado de verificación del usuario"""
+        user = request.user
+        
+        # Obtener códigos de verificación activos
+        active_codes = UserVerificationCode.objects.filter(
+            user=user,
+            is_used=False
+        ).order_by('-created_at')
+        
+        verification_status = []
+        
+        for code in active_codes:
+            status_data = {
+                'verification_type': code.verification_type,
+                'expires_at': code.expires_at,
+                'attempts_remaining': code.max_attempts - code.attempts,
+                'is_valid': code.is_valid()
+            }
+            verification_status.append(status_data)
+        
+        return Response({
+            'user_email': user.email,
+            'email_verified': user.email_verified,
+            'active_verifications': verification_status
+        })
 
 class EmailChangeView(APIView):
     """Vista para solicitar cambio de email"""
@@ -129,81 +203,8 @@ class EmailChangeConfirmView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-class VerificationCodeResendView(APIView):
-    """Vista para reenviar códigos de verificación"""
-    
-    permission_classes = [permissions.IsAuthenticated]
-    
-    def post(self, request):
-        """Reenvía un código de verificación"""
-        serializer = VerificationCodeResendSerializer(data=request.data)
-        
-        if serializer.is_valid():
-            verification_type = serializer.validated_data['verification_type']
-            target_email = serializer.validated_data.get('target_email')
-            
-            # Invalidar códigos anteriores
-            UserVerificationCode.objects.filter(
-                user=request.user,
-                verification_type=verification_type,
-                is_used=False
-            ).update(is_used=True)
-            
-            # Crear nuevo código
-            verification_code = UserVerificationCode.create_code(
-                user=request.user,
-                verification_type=verification_type,
-                target_email=target_email
-            )
-            
-            # Aquí se enviaría el email con el código
-            # Por ahora solo retornamos el código en la respuesta
-            
-            return Response({
-                'message': 'Nuevo código de verificación enviado exitosamente',
-                'code': verification_code.code,  # Solo en desarrollo
-                'expires_at': verification_code.expires_at
-            }, status=status.HTTP_200_OK)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class VerificationStatusView(APIView):
-    """Vista para obtener el estado de verificación"""
-    
-    permission_classes = [permissions.IsAuthenticated]
-    
-    def get(self, request):
-        """Retorna el estado de verificación del usuario"""
-        user = request.user
-        
-        # Obtener códigos de verificación activos
-        active_codes = UserVerificationCode.objects.filter(
-            user=user,
-            is_used=False
-        ).order_by('-created_at')
-        
-        verification_status = []
-        
-        for code in active_codes:
-            status_data = {
-                'verification_type': code.verification_type,
-                'expires_at': code.expires_at,
-                'attempts_remaining': code.max_attempts - code.attempts,
-                'is_valid': code.is_valid()
-            }
-            verification_status.append(status_data)
-        
-        return Response({
-            'user_email': user.email,
-            'email_verified': user.email_verified,
-            'active_verifications': verification_status
-        })
-
-
 class EmailVerificationView(APIView):
-    """Vista para verificar email de registro"""
+    """Vista para solicitar verificación de email de registro"""
     
     permission_classes = [permissions.AllowAny]
     
@@ -251,7 +252,7 @@ class EmailVerificationView(APIView):
 
 
 class EmailVerificationConfirmView(APIView):
-    """Vista para confirmar verificación de email"""
+    """Vista para confirmar verificación de email de registro"""
     
     permission_classes = [permissions.AllowAny]
     

@@ -1,7 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth import get_user_model
-from .models import UserProfile, UserVerificationCode
+# ❌ Eliminado: from .models.user import User
+from .models.user_verification_code import UserVerificationCode
 
 User = get_user_model()
 
@@ -11,8 +12,8 @@ User = get_user_model()
 # o crear un admin personalizado sin usar @admin.register
 
 
-@admin.register(UserProfile)
-class UserProfileAdmin(admin.ModelAdmin):
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
     """Administración para el modelo UserProfile"""
     
     list_display = [

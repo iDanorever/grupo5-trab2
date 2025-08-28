@@ -1,16 +1,19 @@
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+# Importaciones de Django
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import update_last_login
+
+# Importaciones locales
 from ..serializers.password import (
     PasswordChangeSerializer, PasswordResetSerializer,
     PasswordResetConfirmSerializer, PasswordStrengthSerializer
 )
-from ..models import UserVerificationCode
+from ..models.user_verification_code import UserVerificationCode
 
 User = get_user_model()
-
 
 class PasswordChangeView(APIView):
     """Vista para cambiar la contraseña del usuario autenticado"""
@@ -33,7 +36,6 @@ class PasswordChangeView(APIView):
             }, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class PasswordResetView(APIView):
     """Vista para solicitar restablecimiento de contraseña"""
@@ -73,7 +75,6 @@ class PasswordResetView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class PasswordResetConfirmView(APIView):
     """Vista para confirmar el restablecimiento de contraseña"""
     
@@ -95,11 +96,13 @@ class PasswordResetConfirmView(APIView):
                     is_used=False
                 )
                 
+                # Validar expiración del código
                 if verification.is_expired():
                     return Response({
                         'error': 'El código de verificación ha expirado'
                     }, status=status.HTTP_400_BAD_REQUEST)
                 
+                # Validar intentos fallidos
                 if not verification.can_attempt():
                     return Response({
                         'error': 'Demasiados intentos fallidos'
@@ -127,7 +130,6 @@ class PasswordResetConfirmView(APIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class PasswordStrengthView(APIView):
     """Vista para validar la fortaleza de una contraseña"""
     
@@ -152,7 +154,6 @@ class PasswordStrengthView(APIView):
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
-
 class PasswordHistoryView(APIView):
     """Vista para obtener el historial de cambios de contraseña"""
     
@@ -168,8 +169,6 @@ class PasswordHistoryView(APIView):
             'last_changed': request.user.last_login,
             'total_changes': 1  # Placeholder
         })
-
-
 class PasswordPolicyView(APIView):
     """Vista para obtener la política de contraseñas"""
     

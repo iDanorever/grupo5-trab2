@@ -51,7 +51,7 @@ INSTALLED_APPS = [
 ]
 
 # Modelo de usuario personalizado
-AUTH_USER_MODEL = 'architect.User'
+AUTH_USER_MODEL = 'users_profiles.User'
 
 # Configuración de Guardian
 AUTHENTICATION_BACKENDS = (

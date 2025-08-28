@@ -1,30 +1,48 @@
 from rest_framework import serializers
-from ..models import UserVerificationCode
-
+from ..models.user_verification_code import UserVerificationCode
 
 class VerificationCodeSerializer(serializers.ModelSerializer):
-    """Serializer para códigos de verificación"""
+    """Serializer para códigos de verificación del modelo UserVerificationCode"""
     
     class Meta:
         model = UserVerificationCode
         fields = ['code', 'verification_type', 'target_email']
     
     def validate_code(self, value):
-        """Valida el formato del código"""
+        """Valida el formato del código de verificación
+        
+        Args:
+            value (str): Código de verificación a validar
+            
+        Returns:
+            str: Código validado
+            
+        Raises:
+            ValidationError: Si el código no tiene 6 dígitos numéricos
+        """
         if not value.isdigit() or len(value) != 6:
             raise serializers.ValidationError("El código debe ser de 6 dígitos")
         return value
 
-
 class EmailChangeSerializer(serializers.Serializer):
-    """Serializer para cambio de email"""
+    """Serializer para solicitar cambio de email"""
     
     new_email = serializers.EmailField(
         help_text='Nuevo email para la cuenta'
     )
     
     def validate_new_email(self, value):
-        """Valida que el nuevo email no esté en uso"""
+        """Valida que el nuevo email no esté en uso por otro usuario
+        
+        Args:
+            value (str): Nuevo email a validar
+            
+        Returns:
+            str: Email validado
+            
+        Raises:
+            ValidationError: Si el email ya está registrado
+        """
         from django.contrib.auth import get_user_model
         User = get_user_model()
         
@@ -33,9 +51,8 @@ class EmailChangeSerializer(serializers.Serializer):
         
         return value
 
-
 class EmailChangeConfirmSerializer(serializers.Serializer):
-    """Serializer para confirmar cambio de email"""
+    """Serializer para confirmar cambio de email con código de verificación"""
     
     code = serializers.CharField(
         max_length=6,
@@ -43,11 +60,20 @@ class EmailChangeConfirmSerializer(serializers.Serializer):
     )
     
     def validate_code(self, value):
-        """Valida el formato del código"""
+        """Valida el formato del código de confirmación
+        
+        Args:
+            value (str): Código de confirmación a validar
+            
+        Returns:
+            str: Código validado
+            
+        Raises:
+            ValidationError: Si el código no tiene 6 dígitos numéricos
+        """
         if not value.isdigit() or len(value) != 6:
             raise serializers.ValidationError("El código debe ser de 6 dígitos")
         return value
-
 
 class VerificationCodeRequestSerializer(serializers.Serializer):
     """Serializer para solicitar un código de verificación"""
@@ -63,7 +89,20 @@ class VerificationCodeRequestSerializer(serializers.Serializer):
     )
     
     def validate(self, attrs):
-        """Validación personalizada para la solicitud de código"""
+        """Validación personalizada para la solicitud de código
+        
+        Verifica que se proporcione el email objetivo cuando el tipo
+        de verificación sea cambio de email.
+        
+        Args:
+            attrs (dict): Datos validados
+            
+        Returns:
+            dict: Datos validados
+            
+        Raises:
+            ValidationError: Si falta el email objetivo para cambio de email
+        """
         verification_type = attrs.get('verification_type')
         target_email = attrs.get('target_email')
         
@@ -73,7 +112,6 @@ class VerificationCodeRequestSerializer(serializers.Serializer):
             )
         
         return attrs
-
 
 class VerificationCodeResendSerializer(serializers.Serializer):
     """Serializer para reenviar código de verificación"""
@@ -88,9 +126,8 @@ class VerificationCodeResendSerializer(serializers.Serializer):
         help_text='Email objetivo (para cambio de email)'
     )
 
-
 class VerificationStatusSerializer(serializers.Serializer):
-    """Serializer para el estado de verificación"""
+    """Serializer para mostrar el estado de verificación (solo lectura)"""
     
     is_verified = serializers.BooleanField(
         read_only=True,
@@ -112,7 +149,6 @@ class VerificationStatusSerializer(serializers.Serializer):
         help_text='Intentos restantes para usar el código'
     )
 
-
 class EmailVerificationSerializer(serializers.Serializer):
     """Serializer para verificación de email de registro"""
     
@@ -121,7 +157,17 @@ class EmailVerificationSerializer(serializers.Serializer):
     )
     
     def validate_email(self, value):
-        """Valida que el email exista y no esté verificado"""
+        """Valida que el email exista y no esté verificado
+        
+        Args:
+            value (str): Email a validar
+            
+        Returns:
+            str: Email validado
+            
+        Raises:
+            ValidationError: Si el email no existe o ya está verificado
+        """
         from django.contrib.auth import get_user_model
         User = get_user_model()
         

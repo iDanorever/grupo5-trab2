@@ -1,14 +1,17 @@
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+# Importaciones de Django
 from django.shortcuts import get_object_or_404
-from ..models import UserProfile
+from django.db import models
+
+# Importaciones locales
+from ..models.user import User
 from ..serializers.profile import (
     ProfileSerializer, ProfileUpdateSerializer, ProfileCreateSerializer,
     PublicProfileSerializer, ProfileSettingsSerializer
 )
-from django.db import models
-
 
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
     """Vista para obtener y actualizar el perfil del usuario autenticado"""
@@ -23,7 +26,7 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
     
     def get_object(self):
         """Obtiene o crea el perfil del usuario"""
-        profile, created = UserProfile.objects.get_or_create(
+        profile, created = User.objects.get_or_create(
             user=self.request.user,
             defaults={
                 'first_name': self.request.user.first_name or '',
@@ -48,7 +51,6 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
             'profile': ProfileSerializer(instance, context={'request': request}).data
         })
 
-
 class ProfileCreateView(generics.CreateAPIView):
     """Vista para crear un perfil de usuario"""
     
@@ -70,23 +72,21 @@ class ProfileCreateView(generics.CreateAPIView):
             'profile': ProfileSerializer(serializer.instance, context={'request': request}).data
         }, status=status.HTTP_201_CREATED)
 
-
 class PublicProfileView(generics.RetrieveAPIView):
     """Vista para obtener perfiles públicos de usuarios"""
     
     serializer_class = PublicProfileSerializer
     permission_classes = [permissions.AllowAny]
-    queryset = UserProfile.objects.filter(is_public=True)
+    queryset = User.objects.filter(is_public=True)
     
     def get_object(self):
         """Retorna el perfil por username"""
         username = self.kwargs.get('username')
         return get_object_or_404(
-            UserProfile,
+            User,
             user__username=username,
             is_public=True
         )
-
 
 class ProfileSettingsView(generics.UpdateAPIView):
     """Vista para actualizar configuraciones del perfil"""
@@ -96,7 +96,7 @@ class ProfileSettingsView(generics.UpdateAPIView):
     
     def get_object(self):
         """Obtiene el perfil del usuario"""
-        profile, created = UserProfile.objects.get_or_create(
+        profile, created = User.objects.get_or_create(
             user=self.request.user,
             defaults={
                 'first_name': self.request.user.first_name or '',
@@ -121,7 +121,6 @@ class ProfileSettingsView(generics.UpdateAPIView):
             'settings': ProfileSettingsSerializer(instance).data
         })
 
-
 class ProfileCompletionView(APIView):
     """Vista para obtener el porcentaje de completitud del perfil"""
     
@@ -129,7 +128,7 @@ class ProfileCompletionView(APIView):
     
     def get(self, request):
         """Retorna el porcentaje de completitud del perfil"""
-        profile, created = UserProfile.objects.get_or_create(
+        profile, created = User.objects.get_or_create(
             user=request.user,
             defaults={
                 'first_name': request.user.first_name or '',
@@ -152,6 +151,7 @@ class ProfileCompletionView(APIView):
         """Retorna los campos que faltan para completar el perfil"""
         missing = []
         
+        # Validar campos requeridos
         if not profile.first_name:
             missing.append('first_name')
         if not profile.paternal_lastname:
@@ -163,13 +163,12 @@ class ProfileCompletionView(APIView):
         
         return missing
 
-
 class ProfileSearchView(generics.ListAPIView):
     """Vista para buscar perfiles públicos"""
     
     serializer_class = PublicProfileSerializer
     permission_classes = [permissions.AllowAny]
-    queryset = UserProfile.objects.filter(is_public=True)
+    queryset = User.objects.filter(is_public=True)
     
     def get_queryset(self):
         """Filtra perfiles según parámetros de búsqueda"""

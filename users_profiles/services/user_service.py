@@ -5,13 +5,12 @@ from ..models import UserProfile
 
 User = get_user_model()
 
-
 class UserService:
     """Servicio para lógica de negocio relacionada con usuarios"""
     
     @staticmethod
     def create_user(user_data):
-        """Crea un nuevo usuario con validaciones"""
+        """Crear un nuevo usuario con perfil básico"""
         try:
             with transaction.atomic():
                 # Crear el usuario
@@ -23,7 +22,7 @@ class UserService:
                     last_name=user_data.get('last_name', '')
                 )
                 
-                # Crear perfil básico
+                # Crear perfil básico automáticamente
                 UserProfile.objects.create(
                     user=user,
                     first_name=user_data.get('first_name', ''),
@@ -40,7 +39,7 @@ class UserService:
     
     @staticmethod
     def update_user(user, user_data):
-        """Actualiza la información del usuario"""
+        """Actualizar información del usuario"""
         try:
             with transaction.atomic():
                 # Actualizar campos del usuario
@@ -56,7 +55,7 @@ class UserService:
     
     @staticmethod
     def update_profile_photo(user, photo_file):
-        """Actualiza la foto de perfil del usuario"""
+        """Actualizar foto de perfil del usuario"""
         try:
             # Eliminar foto anterior si existe
             if user.profile_photo:
@@ -73,7 +72,7 @@ class UserService:
     
     @staticmethod
     def delete_profile_photo(user):
-        """Elimina la foto de perfil del usuario"""
+        """Eliminar foto de perfil del usuario"""
         try:
             if user.profile_photo:
                 user.profile_photo.delete(save=False)
@@ -86,7 +85,7 @@ class UserService:
     
     @staticmethod
     def search_users(query, limit=20):
-        """Busca usuarios por nombre o username"""
+        """Buscar usuarios por nombre o username"""
         try:
             from django.db.models import Q
             
@@ -106,7 +105,7 @@ class UserService:
     
     @staticmethod
     def get_user_by_username(username):
-        """Obtiene un usuario por username"""
+        """Obtener usuario por username"""
         try:
             return User.objects.get(username=username, is_active=True)
         except User.DoesNotExist:
@@ -114,7 +113,7 @@ class UserService:
     
     @staticmethod
     def get_user_by_email(email):
-        """Obtiene un usuario por email"""
+        """Obtener usuario por email"""
         try:
             return User.objects.get(email=email, is_active=True)
         except User.DoesNotExist:
@@ -122,7 +121,7 @@ class UserService:
     
     @staticmethod
     def deactivate_user(user):
-        """Desactiva un usuario"""
+        """Desactivar usuario"""
         try:
             user.is_active = False
             user.save()
@@ -132,7 +131,7 @@ class UserService:
     
     @staticmethod
     def activate_user(user):
-        """Activa un usuario"""
+        """Activar usuario"""
         try:
             user.is_active = True
             user.save()
@@ -142,7 +141,7 @@ class UserService:
     
     @staticmethod
     def get_user_stats(user):
-        """Obtiene estadísticas del usuario"""
+        """Obtener estadísticas del usuario"""
         try:
             stats = {
                 'username': user.username,

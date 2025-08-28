@@ -1,38 +1,28 @@
-"""
-Servicio para gestión de perfiles de usuario
-"""
-
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-from ..models.profile import UserProfile
+from ..models.user import User
 
 User = get_user_model()
 
-
 class ProfileService:
-    """Servicio para gestión de perfiles de usuario"""
+    """
+    Servicio para gestión de perfiles de usuario.
+    """
     
     @staticmethod
     def create_profile(user, profile_data):
         """
-        Crear un perfil para un usuario
-        
-        Args:
-            user: Usuario al que se le creará el perfil
-            profile_data: Datos del perfil
-            
-        Returns:
-            UserProfile: Perfil creado
+        Crear un perfil para un usuario.
         """
         try:
             with transaction.atomic():
-                # Verificar si ya existe un perfil
+                # Verificar si ya existe un perfil para evitar duplicados
                 if hasattr(user, 'profile'):
                     raise ValidationError("El usuario ya tiene un perfil")
                 
-                # Crear el perfil
-                profile = UserProfile.objects.create(
+                # Crear el perfil con los datos proporcionados
+                profile = User.objects.create(
                     user=user,
                     **profile_data
                 )
@@ -45,20 +35,13 @@ class ProfileService:
     @staticmethod
     def update_profile(user, profile_data):
         """
-        Actualizar el perfil de un usuario
-        
-        Args:
-            user: Usuario cuyo perfil se actualizará
-            profile_data: Datos a actualizar
-            
-        Returns:
-            UserProfile: Perfil actualizado
+        Actualizar el perfil de un usuario.
         """
         try:
             with transaction.atomic():
                 profile = user.profile
                 
-                # Actualizar campos
+                # Actualizar solo los campos que existen en el modelo
                 for field, value in profile_data.items():
                     if hasattr(profile, field):
                         setattr(profile, field, value)
@@ -72,61 +55,42 @@ class ProfileService:
     @staticmethod
     def get_profile_by_user(user):
         """
-        Obtener el perfil de un usuario
-        
-        Args:
-            user: Usuario del cual obtener el perfil
-            
-        Returns:
-            UserProfile: Perfil del usuario o None si no existe
+        Obtener el perfil de un usuario específico.
         """
         try:
             return user.profile
-        except UserProfile.DoesNotExist:
+        except User.DoesNotExist:
             return None
     
     @staticmethod
     def get_public_profiles():
         """
-        Obtener todos los perfiles públicos
-        
-        Returns:
-            QuerySet: Perfiles públicos
+        Obtener todos los perfiles públicos del sistema.
         """
-        return UserProfile.objects.filter(is_public=True)
+        return User.objects.filter(is_public=True)
     
     @staticmethod
     def get_profile_by_username(username):
         """
-        Obtener perfil por username
-        
-        Args:
-            username: Username del usuario
-            
-        Returns:
-            UserProfile: Perfil del usuario o None si no existe
+        Obtener perfil de usuario por su nombre de usuario.
         """
         try:
             user = User.objects.get(username=username)
             return user.profile
-        except (User.DoesNotExist, UserProfile.DoesNotExist):
+        except (User.DoesNotExist, User.DoesNotExist):
             return None
     
     @staticmethod
     def calculate_profile_completion(profile):
         """
-        Calcular el porcentaje de completitud del perfil
-        
-        Args:
-            profile: Perfil a evaluar
-            
-        Returns:
-            int: Porcentaje de completitud (0-100)
+        Calcular el porcentaje de completitud del perfil.
         """
+        # Campos obligatorios que deben estar completos
         required_fields = [
             'first_name', 'paternal_lastname', 'gender', 'email'
         ]
         
+        # Campos opcionales que mejoran el perfil
         optional_fields = [
             'maternal_lastname', 'bio', 'website'
         ]
@@ -134,28 +98,23 @@ class ProfileService:
         total_fields = len(required_fields) + len(optional_fields)
         completed_fields = 0
         
-        # Verificar campos requeridos
+        # Verificar campos requeridos (peso completo)
         for field in required_fields:
             if getattr(profile, field):
                 completed_fields += 1
         
-        # Verificar campos opcionales (valen menos)
+        # Verificar campos opcionales (peso reducido)
         for field in optional_fields:
             if getattr(profile, field):
                 completed_fields += 0.5
         
+        # Calcular porcentaje y limitar a 100
         return min(100, int((completed_fields / total_fields) * 100))
     
     @staticmethod
     def get_profile_stats(profile):
         """
-        Obtener estadísticas del perfil
-        
-        Args:
-            profile: Perfil a analizar
-            
-        Returns:
-            dict: Estadísticas del perfil
+        Obtener estadísticas completas del perfil.
         """
         return {
             'completion_percentage': ProfileService.calculate_profile_completion(profile),
@@ -169,14 +128,9 @@ class ProfileService:
     @staticmethod
     def toggle_profile_visibility(profile):
         """
-        Cambiar la visibilidad del perfil
-        
-        Args:
-            profile: Perfil a modificar
-            
-        Returns:
-            UserProfile: Perfil actualizado
+        Cambiar la visibilidad del perfil entre público y privado.
         """
+        # Alternar el estado de visibilidad
         profile.is_public = not profile.is_public
         profile.save()
         return profile
@@ -184,17 +138,12 @@ class ProfileService:
     @staticmethod
     def update_privacy_settings(profile, privacy_data):
         """
-        Actualizar configuraciones de privacidad
-        
-        Args:
-            profile: Perfil a modificar
-            privacy_data: Datos de privacidad
-            
-        Returns:
-            UserProfile: Perfil actualizado
+        Actualizar las configuraciones de privacidad del perfil.
         """
+        # Campos de privacidad válidos para actualizar
         privacy_fields = ['show_email', 'show_phone', 'receive_notifications']
         
+        # Actualizar solo los campos de privacidad válidos
         for field in privacy_fields:
             if field in privacy_data:
                 setattr(profile, field, privacy_data[field])
