@@ -2,11 +2,15 @@ from rest_framework import serializers
 from .user import UserSerializer
 from ..models.user import User
 
-
 class ProfileSerializer(serializers.ModelSerializer):
-    """Serializer para lectura del perfil de usuario"""
+    """Serializer para lectura completa del perfil de usuario.
     
-    completion_percentage = serializers.SerializerMethodField()
+    Incluye información del usuario relacionado y el porcentaje de completitud.
+    Usado principalmente para mostrar el perfil completo al propietario.
+    """
+    
+    user = UserSerializer(read_only=True)  # Información del usuario asociado
+    completion_percentage = serializers.SerializerMethodField()  # Porcentaje calculado
     
     class Meta:
         model = User
@@ -19,14 +23,16 @@ class ProfileSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'user_name', 'date_joined', 'last_login', 'account_statement']
     
     def get_completion_percentage(self, obj):
-        """Retorna el porcentaje de completitud del perfil"""
-        required_fields = ['name', 'email', 'phone']
-        completed_fields = sum(1 for field in required_fields if getattr(obj, field))
-        return (completed_fields / len(required_fields)) * 100
+        """Calcula y retorna el porcentaje de completitud del perfil."""
+        return obj.get_completion_percentage()
 
 
 class ProfileCreateSerializer(serializers.ModelSerializer):
-    """Serializer para crear un perfil de usuario"""
+    """Serializer para crear un nuevo perfil de usuario.
+    
+    Valida que el email no esté duplicado y asocia automáticamente
+    el perfil al usuario autenticado.
+    """
     
     class Meta:
         model = User
@@ -36,14 +42,13 @@ class ProfileCreateSerializer(serializers.ModelSerializer):
         ]
     
     def validate_email(self, value):
-        """Validación personalizada para el email"""
-        # Verificar que el email no esté en uso por otro usuario
+        """Valida que el email no esté registrado en otro perfil."""
         if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError("Este email ya está registrado")
+            raise serializers.ValidationError("Este email ya está registrado en otro perfil")
         return value
     
     def create(self, validated_data):
-        """Crea un nuevo perfil de usuario"""
+        """Crea un nuevo perfil asociado al usuario autenticado."""
         user = self.context['request'].user
         for attr, value in validated_data.items():
             setattr(user, attr, value)
@@ -52,7 +57,11 @@ class ProfileCreateSerializer(serializers.ModelSerializer):
 
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
-    """Serializer para actualizar el perfil de usuario"""
+    """Serializer para actualizar un perfil existente.
+    
+    Permite actualizar todos los campos del perfil excepto el usuario asociado.
+    Valida que el email no esté en uso por otro perfil.
+    """
     
     class Meta:
         model = User
@@ -62,7 +71,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         ]
     
     def validate_email(self, value):
-        """Validación personalizada para el email"""
+        """Valida que el email no esté en uso por otro perfil."""
         user = self.context['request'].user
         # Verificar que el email no esté en uso por otro usuario (excluyendo el actual)
         if User.objects.filter(email=value).exclude(id=user.id).exists():
@@ -70,7 +79,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         return value
     
     def update(self, instance, validated_data):
-        """Actualiza la instancia del perfil"""
+        """Actualiza los campos del perfil."""
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -78,9 +87,14 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
 
 
 class PublicProfileSerializer(serializers.ModelSerializer):
-    """Serializer para perfiles públicos (sin información sensible)"""
+    """Serializer para perfiles públicos sin información sensible.
     
-    display_name = serializers.SerializerMethodField()
+    Filtra automáticamente la información según las configuraciones de privacidad
+    del usuario. Usado para mostrar perfiles a otros usuarios.
+    """
+    
+    user = serializers.SerializerMethodField()  # Info básica del usuario
+    display_name = serializers.SerializerMethodField()  # Nombre para mostrar
     
     class Meta:
         model = User
@@ -96,7 +110,11 @@ class PublicProfileSerializer(serializers.ModelSerializer):
 
 
 class ProfileSettingsSerializer(serializers.ModelSerializer):
-    """Serializer para configuraciones del perfil"""
+    """Serializer para configuraciones de privacidad del perfil.
+    
+    Permite actualizar únicamente las configuraciones de visibilidad
+    y notificaciones sin afectar otros datos del perfil.
+    """
     
     class Meta:
         model = User
@@ -105,7 +123,7 @@ class ProfileSettingsSerializer(serializers.ModelSerializer):
         ]
     
     def update(self, instance, validated_data):
-        """Actualiza solo las configuraciones del perfil"""
+        """Actualiza solo las configuraciones de privacidad."""
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()

@@ -1,5 +1,5 @@
 """
-Servicio para verificación de email de usuario
+Servicio para gestión de verificaciones de email y códigos de verificación
 """
 
 from django.db import transaction
@@ -11,14 +11,13 @@ from ..models.user_verification_code import UserVerificationCode
 
 User = get_user_model()
 
-
 class VerificationService:
     """Servicio para verificación de email de usuario"""
     
     @staticmethod
     def send_verification_email(user, verification_type='email_verification'):
         """
-        Enviar email de verificación
+        Envía email de verificación al usuario
         
         Args:
             user: Usuario al que enviar el email
@@ -61,7 +60,7 @@ class VerificationService:
     @staticmethod
     def verify_email_code(code, verification_type='email_verification'):
         """
-        Verificar código de email
+        Verifica código de email y actualiza estado del usuario
         
         Args:
             code: Código de verificación
@@ -105,7 +104,7 @@ class VerificationService:
     @staticmethod
     def resend_verification_email(user, verification_type='email_verification'):
         """
-        Reenviar email de verificación
+        Reenvía email de verificación invalidando códigos anteriores
         
         Args:
             user: Usuario al que reenviar el email
@@ -131,7 +130,7 @@ class VerificationService:
     @staticmethod
     def request_email_change(user, new_email):
         """
-        Solicitar cambio de email
+        Solicita cambio de email enviando código de verificación
         
         Args:
             user: Usuario que solicita el cambio
@@ -179,7 +178,7 @@ class VerificationService:
     @staticmethod
     def _prepare_email_content(user, verification_code, verification_type, new_email=None):
         """
-        Preparar contenido del email de verificación
+        Prepara contenido del email según tipo de verificación
         
         Args:
             user: Usuario
@@ -279,7 +278,7 @@ class VerificationService:
     @staticmethod
     def get_verification_status(user):
         """
-        Obtener estado de verificación del usuario
+        Obtiene estado de verificación del usuario
         
         Args:
             user: Usuario a verificar
@@ -298,7 +297,7 @@ class VerificationService:
     @staticmethod
     def cleanup_expired_codes():
         """
-        Limpiar códigos de verificación expirados
+        Limpia códigos de verificación expirados
         
         Returns:
             int: Número de códigos eliminados

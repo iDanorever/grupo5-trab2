@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,7 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'django_filters',
-    'guardian',
+    #'guardian',
     'appointments_status.apps.AppointmentsStatusConfig',
     'architect.apps.ArchitectConfig',
     'histories_configurations',
@@ -53,10 +54,14 @@ INSTALLED_APPS = [
 # Modelo de usuario personalizado
 AUTH_USER_MODEL = 'users_profiles.User'
 
+# --- Guardian: evita crear el usuario anónimo mientras arreglas migraciones ---
+GUARDIAN_AUTO_CREATE_ANONYMOUS_USER = False
+#ANONYMOUS_USER_NAME = "anonymous"
+
 # Configuración de Guardian
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
-    'guardian.backends.ObjectPermissionBackend',
+    #'guardian.backends.ObjectPermissionBackend',
 )
 
 MIDDLEWARE = [
@@ -149,6 +154,10 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # Archivos multimedia (subidos por el usuario)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

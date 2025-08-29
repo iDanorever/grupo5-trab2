@@ -4,12 +4,15 @@ from django.contrib.auth.password_validation import validate_password
 
 User = get_user_model()
 
-
 class UserSerializer(serializers.ModelSerializer):
-    """Serializer para lectura del modelo User"""
+    """Serializer para lectura completa del modelo User.
     
-    full_name = serializers.SerializerMethodField()
-    profile_photo_url = serializers.SerializerMethodField()
+    Incluye campos calculados como nombre completo y URL de foto de perfil.
+    Usado principalmente para mostrar información del usuario.
+    """
+    
+    full_name = serializers.SerializerMethodField()  # Nombre completo calculado
+    profile_photo_url = serializers.SerializerMethodField()  # URL de foto de perfil
     
     class Meta:
         model = User
@@ -28,9 +31,12 @@ class UserSerializer(serializers.ModelSerializer):
         """Retorna la URL de la foto de perfil"""
         return obj.photo_url if obj.photo_url else None
 
-
 class UserUpdateSerializer(serializers.ModelSerializer):
-    """Serializer para actualización del modelo User"""
+    """Serializer para actualización de datos básicos del usuario.
+    
+    Permite actualizar nombre, apellido y teléfono.
+    No incluye campos sensibles como email o username.
+    """
     
     class Meta:
         model = User
@@ -39,27 +45,30 @@ class UserUpdateSerializer(serializers.ModelSerializer):
         ]
     
     def validate_phone(self, value):
-        """Validación personalizada para el número de teléfono"""
+        """Valida el formato del número de teléfono."""
         if value:
-            # Validación básica de formato de teléfono
+            # Validación básica de longitud mínima
             if len(value) < 7:
                 raise serializers.ValidationError("El número de teléfono debe tener al menos 7 dígitos")
         return value
     
     def update(self, instance, validated_data):
-        """Actualiza la instancia del usuario"""
+        """Actualiza los campos básicos del usuario."""
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
         return instance
 
-
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    """Serializer para registro de nuevos usuarios"""
+    """Serializer para registro de nuevos usuarios.
+    
+    Incluye validación de contraseñas, verificación de unicidad
+    de email y username, y creación segura del usuario.
+    """
     
     password = serializers.CharField(
         write_only=True,
-        validators=[validate_password],
+        validators=[validate_password],  # Validación de Django para contraseñas
         help_text='La contraseña debe cumplir con los requisitos de seguridad'
     )
     
@@ -76,11 +85,12 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         ]
     
     def validate(self, attrs):
-        """Validación personalizada para el registro"""
+        """Validación completa para el registro de usuario."""
+        # Verificar que las contraseñas coincidan
         if attrs['password'] != attrs['password_confirm']:
             raise serializers.ValidationError("Las contraseñas no coinciden")
         
-        # Verificar que el email no esté en uso
+        # Verificar unicidad del email
         if User.objects.filter(email=attrs['email']).exists():
             raise serializers.ValidationError("Este email ya está registrado")
         
@@ -91,14 +101,17 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return attrs
     
     def create(self, validated_data):
-        """Crea un nuevo usuario"""
-        validated_data.pop('password_confirm')
+        """Crea un nuevo usuario con contraseña encriptada."""
+        validated_data.pop('password_confirm')  # Remover confirmación
         user = User.objects.create_user(**validated_data)
         return user
 
-
 class UserProfilePhotoSerializer(serializers.ModelSerializer):
-    """Serializer para actualización de la foto de perfil"""
+    """Serializer para actualización de la foto de perfil del usuario.
+    
+    Maneja la subida de imágenes y eliminación de fotos anteriores
+    para evitar acumulación de archivos no utilizados.
+    """
     
     photo_url = serializers.CharField(
         max_length=255,

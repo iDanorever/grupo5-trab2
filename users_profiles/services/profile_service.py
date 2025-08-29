@@ -1,16 +1,13 @@
-"""
-Servicio para gestión de perfiles de usuario
-"""
-
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-
 class ProfileService:
-    """Servicio para gestión de perfiles de usuario"""
+    """
+    Servicio para gestión de perfiles de usuario.
+    """
     
     @staticmethod
     def create_profile(user, profile_data):
@@ -112,10 +109,13 @@ class ProfileService:
         Returns:
             int: Porcentaje de completitud (0-100)
         """
+        """
+        # Campos obligatorios que deben estar completos
         required_fields = [
             'name', 'email', 'phone'
         ]
         
+        # Campos opcionales que mejoran el perfil
         optional_fields = [
             'paternal_lastname', 'maternal_lastname', 'photo_url', 'document_number'
         ]
@@ -123,16 +123,17 @@ class ProfileService:
         total_fields = len(required_fields) + len(optional_fields)
         completed_fields = 0
         
-        # Verificar campos requeridos
+        # Verificar campos requeridos (peso completo)
         for field in required_fields:
             if getattr(user, field):
                 completed_fields += 1
         
-        # Verificar campos opcionales (valen menos)
+        # Verificar campos opcionales (peso reducido)
         for field in optional_fields:
             if getattr(user, field):
                 completed_fields += 0.5
         
+        # Calcular porcentaje y limitar a 100
         return min(100, int((completed_fields / total_fields) * 100))
     
     @staticmethod
@@ -145,6 +146,7 @@ class ProfileService:
             
         Returns:
             dict: Estadísticas del perfil
+        """
         """
         return {
             'completion_percentage': ProfileService.calculate_profile_completion(user),

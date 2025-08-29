@@ -1,71 +1,87 @@
+# users_profiles/views/profile.py
+
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+# Django
 from django.shortcuts import get_object_or_404
+from django.db import models
 from django.contrib.auth import get_user_model
+
+# Serializers
 from ..serializers.profile import (
     ProfileSerializer, ProfileUpdateSerializer, ProfileCreateSerializer,
     PublicProfileSerializer, ProfileSettingsSerializer
 )
-from django.db import models
+
+User = get_user_model()
 
 User = get_user_model()
 
 
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
-    """Vista para obtener y actualizar el perfil del usuario autenticado"""
-    
+    """
+    Vista para obtener y actualizar el perfil del usuario autenticado.
+    Ahora trabajamos directamente con el CustomUser (AUTH_USER_MODEL).
+    """
+
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_serializer_class(self):
         """Retorna el serializer apropiado según el método HTTP"""
         if self.request.method == 'GET':
             return ProfileSerializer
         return ProfileUpdateSerializer
-    
+
     def get_object(self):
         """Obtiene el usuario autenticado"""
         return self.request.user
-    
     def update(self, request, *args, **kwargs):
-        """Actualiza el perfil del usuario"""
+        """Actualiza los datos del usuario"""
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
-        
+
         return Response({
             'message': 'Perfil actualizado exitosamente',
-            'profile': ProfileSerializer(instance, context={'request': request}).data
+            'profile': ProfileSerializer(instance, context={'request': request}).data,
         })
 
 
 class ProfileCreateView(generics.CreateAPIView):
-    """Vista para crear un perfil de usuario"""
-    
+    """
+    Vista para crear un 'perfil'.
+    Si realmente usas solo el CustomUser, esta vista probablemente no sea necesaria.
+    La dejo para compatibilidad, asumiendo que tu serializer crea/actualiza sobre el propio usuario.
+    """
+
     serializer_class = ProfileCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def perform_create(self, serializer):
         """Crea el perfil asociado al usuario autenticado"""
         serializer.save()
-    
     def create(self, request, *args, **kwargs):
-        """Crea el perfil y retorna la respuesta"""
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
-        
+
+        # Asumimos que el serializer trabaja sobre request.user o devuelve datos del usuario
         return Response({
-            'message': 'Perfil creado exitosamente',
-            'profile': ProfileSerializer(serializer.instance, context={'request': request}).data
+            'message': 'Perfil creado/actualizado exitosamente',
+            'profile': ProfileSerializer(request.user, context={'request': request}).data,
         }, status=status.HTTP_201_CREATED)
 
 
 class PublicProfileView(generics.RetrieveAPIView):
-    """Vista para obtener perfiles públicos de usuarios"""
-    
+    """
+    Vista para obtener perfiles 'públicos'. Dado que tu modelo no tiene is_public,
+    usamos is_active=True como criterio básico (ajústalo si tu lógica de “público” es otra).
+    """
+
     serializer_class = PublicProfileSerializer
     permission_classes = [permissions.AllowAny]
     queryset = User.objects.filter(is_active=True)
@@ -81,34 +97,38 @@ class PublicProfileView(generics.RetrieveAPIView):
 
 
 class ProfileSettingsView(generics.UpdateAPIView):
-    """Vista para actualizar configuraciones del perfil"""
-    
+    """
+    Vista para actualizar configuraciones del 'perfil' del usuario.
+    Operamos directamente sobre request.user.
+    """
+
     serializer_class = ProfileSettingsSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_object(self):
         """Obtiene el usuario autenticado"""
         return self.request.user
-    
     def update(self, request, *args, **kwargs):
-        """Actualiza las configuraciones del perfil"""
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
-        
+
         return Response({
             'message': 'Configuraciones del perfil actualizadas exitosamente',
-            'settings': ProfileSettingsSerializer(instance).data
+            'settings': ProfileSettingsSerializer(instance).data,
         })
 
 
 class ProfileCompletionView(APIView):
-    """Vista para obtener el porcentaje de completitud del perfil"""
-    
+    """
+    Vista para obtener el porcentaje de completitud del perfil.
+    Trabajamos con el CustomUser directamente.
+    """
+
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get(self, request):
         """Retorna el porcentaje de completitud del perfil"""
         user = request.user
@@ -141,8 +161,11 @@ class ProfileCompletionView(APIView):
 
 
 class ProfileSearchView(generics.ListAPIView):
-    """Vista para buscar perfiles públicos"""
-    
+    """
+    Vista para buscar 'perfiles' públicos.
+    Sin 'is_public', usamos is_active=True como filtro base.
+    """
+
     serializer_class = PublicProfileSerializer
     permission_classes = [permissions.AllowAny]
     queryset = User.objects.filter(is_active=True)
@@ -150,14 +173,15 @@ class ProfileSearchView(generics.ListAPIView):
     def get_queryset(self):
         """Filtra usuarios según parámetros de búsqueda"""
         queryset = super().get_queryset()
-        
         # Búsqueda por nombre
-        name_query = self.request.query_params.get('name', None)
+        name_query = self.request.query_params.get('name')
         if name_query:
             queryset = queryset.filter(
                 models.Q(name__icontains=name_query) |
                 models.Q(paternal_lastname__icontains=name_query) |
-                models.Q(maternal_lastname__icontains=name_query)
+                models.Q(maternal_lastname__icontains=name_query) |
+                models.Q(username__icontains=name_query) |
+                models.Q(email__icontains=name_query)
             )
         
         # Filtro por género

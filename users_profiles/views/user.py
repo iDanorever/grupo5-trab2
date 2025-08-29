@@ -1,16 +1,18 @@
 from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+# Django Core
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import get_user_model
 from django.db import models
+
+# Serializadores locales
 from ..serializers.user import (
     UserSerializer, UserUpdateSerializer, UserProfilePhotoSerializer
 )
 
 User = get_user_model()
-
-
 class UserDetailView(generics.RetrieveAPIView):
     """Vista para obtener detalles del usuario autenticado"""
     
@@ -20,7 +22,6 @@ class UserDetailView(generics.RetrieveAPIView):
     def get_object(self):
         """Retorna el usuario autenticado"""
         return self.request.user
-
 
 class UserUpdateView(generics.UpdateAPIView):
     """Vista para actualizar información del usuario"""
@@ -45,9 +46,8 @@ class UserUpdateView(generics.UpdateAPIView):
             'user': UserSerializer(instance, context={'request': request}).data
         })
 
-
 class UserProfilePhotoView(APIView):
-    """Vista para actualizar la foto de perfil del usuario"""
+    """Vista para gestionar la foto de perfil del usuario"""
     
     permission_classes = [permissions.IsAuthenticated]
     
@@ -81,7 +81,6 @@ class UserProfilePhotoView(APIView):
             'message': 'No tienes una foto de perfil para eliminar'
         }, status=status.HTTP_400_BAD_REQUEST)
 
-
 class UserSearchView(generics.ListAPIView):
     """Vista para buscar usuarios por nombre o username"""
     
@@ -101,7 +100,6 @@ class UserSearchView(generics.ListAPIView):
             )
         
         return queryset[:20]  # Limitar a 20 resultados
-
 
 class UserProfileView(generics.RetrieveAPIView):
     """Vista para obtener perfil completo del usuario autenticado"""

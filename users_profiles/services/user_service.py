@@ -4,13 +4,12 @@ from django.db import transaction
 
 User = get_user_model()
 
-
 class UserService:
     """Servicio para lógica de negocio relacionada con usuarios"""
     
     @staticmethod
     def create_user(user_data):
-        """Crea un nuevo usuario con validaciones"""
+        """Crear un nuevo usuario con perfil básico"""
         try:
             with transaction.atomic():
                 # Crear el usuario
@@ -30,7 +29,7 @@ class UserService:
     
     @staticmethod
     def update_user(user, user_data):
-        """Actualiza la información del usuario"""
+        """Actualizar información del usuario"""
         try:
             with transaction.atomic():
                 # Actualizar campos del usuario
@@ -59,7 +58,7 @@ class UserService:
     
     @staticmethod
     def delete_profile_photo(user):
-        """Elimina la foto de perfil del usuario"""
+        """Eliminar foto de perfil del usuario"""
         try:
             user.photo_url = None
             user.save()
@@ -70,7 +69,7 @@ class UserService:
     
     @staticmethod
     def search_users(query, limit=20):
-        """Busca usuarios por nombre o username"""
+        """Buscar usuarios por nombre o username"""
         try:
             from django.db.models import Q
             
@@ -98,7 +97,7 @@ class UserService:
     
     @staticmethod
     def get_user_by_email(email):
-        """Obtiene un usuario por email"""
+        """Obtener usuario por email"""
         try:
             return User.objects.get(email=email, is_active=True)
         except User.DoesNotExist:
@@ -106,7 +105,7 @@ class UserService:
     
     @staticmethod
     def deactivate_user(user):
-        """Desactiva un usuario"""
+        """Desactivar usuario"""
         try:
             user.is_active = False
             user.save()
@@ -116,7 +115,7 @@ class UserService:
     
     @staticmethod
     def activate_user(user):
-        """Activa un usuario"""
+        """Activar usuario"""
         try:
             user.is_active = True
             user.save()
@@ -126,7 +125,7 @@ class UserService:
     
     @staticmethod
     def get_user_stats(user):
-        """Obtiene estadísticas del usuario"""
+        """Obtener estadísticas del usuario"""
         try:
             stats = {
                 'user_name': user.user_name,

@@ -4,8 +4,29 @@ from .password import PasswordChangeSerializer, PasswordResetSerializer, Passwor
 from .verification import VerificationCodeSerializer, EmailChangeSerializer, EmailChangeConfirmSerializer, VerificationCodeRequestSerializer, VerificationCodeResendSerializer, VerificationStatusSerializer
 
 __all__ = [
-    'UserSerializer', 'UserUpdateSerializer', 'UserProfilePhotoSerializer',
-    'ProfileSerializer', 'ProfileUpdateSerializer', 'ProfileCreateSerializer', 'PublicProfileSerializer', 'ProfileSettingsSerializer',
-    'PasswordChangeSerializer', 'PasswordResetSerializer', 'PasswordResetConfirmSerializer', 'PasswordStrengthSerializer',
-    'VerificationCodeSerializer', 'EmailChangeSerializer', 'EmailChangeConfirmSerializer', 'VerificationCodeRequestSerializer', 'VerificationCodeResendSerializer', 'VerificationStatusSerializer'
+    # Serializadores de Usuario
+    'UserSerializer',
+    'UserUpdateSerializer', 
+    'UserProfilePhotoSerializer',
+    
+    # Serializadores de Perfil
+    'ProfileSerializer',
+    'ProfileUpdateSerializer',
+    'ProfileCreateSerializer',
+    'PublicProfileSerializer',
+    'ProfileSettingsSerializer',
+    
+    # Serializadores de Contraseña
+    'PasswordChangeSerializer',
+    'PasswordResetSerializer',
+    'PasswordResetConfirmSerializer',
+    'PasswordStrengthSerializer',
+    
+    # Serializadores de Verificación
+    'VerificationCodeSerializer',
+    'EmailChangeSerializer',
+    'EmailChangeConfirmSerializer',
+    'VerificationCodeRequestSerializer',
+    'VerificationCodeResendSerializer',
+    'VerificationStatusSerializer'
 ]
