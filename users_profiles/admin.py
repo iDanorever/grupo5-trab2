@@ -30,9 +30,9 @@ class CustomUserAdmin(BaseUserAdmin):
     """
 
     list_display = (
-        "user_name",
+        "username",
         "email",
-        "name",
+        "first_name",
         "paternal_lastname",
         "maternal_lastname",
         "sex",
@@ -40,7 +40,7 @@ class CustomUserAdmin(BaseUserAdmin):
         "is_staff",
         "date_joined",
     )
-    list_display_links = ("user_name", "email")
+    list_display_links = ("username", "email")
     list_filter = (
         "is_active",
         "is_staff",
@@ -49,21 +49,22 @@ class CustomUserAdmin(BaseUserAdmin):
         "date_joined",
     )
     search_fields = (
-        "user_name",
+        "username",
         "email",
-        "name",
+        "first_name",
         "paternal_lastname",
         "maternal_lastname",
     )
     ordering = ("-updated_at", "-date_joined")
 
     fieldsets = (
-        ("Credenciales", {"fields": ("user_name", "email", "password")}),
+        ("Credenciales", {"fields": ("username", "password")}),
         ("Información personal", {
             "fields": (
-                "name",
+                "first_name",
                 "paternal_lastname",
                 "maternal_lastname",
+                "email",
                 "sex",
                 "photo_url",
                 "phone",
@@ -85,7 +86,7 @@ class CustomUserAdmin(BaseUserAdmin):
     add_fieldsets = (
         (None, {
             "classes": ("wide",),
-            "fields": ("user_name", "email", "password1", "password2"),
+            "fields": ("username", "email", "password1", "password2"),
         }),
     )
 
@@ -183,7 +184,7 @@ class UserVerificationCodeAdmin(admin.ModelAdmin):
         col_expires_at,
     )
     list_filter = (VerificationTypeListFilter, UsedListFilter, "created_at", "expires_at")
-    search_fields = ("user__user_name", "user__email", "code", "target_email", "email")
+    search_fields = ("user__username", "user__email", "code", "target_email", "email")
     ordering = ("-created_at",)
 
     def get_queryset(self, request):
