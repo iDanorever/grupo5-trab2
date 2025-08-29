@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.core.validators import FileExtensionValidator
 
 class CompanyData(models.Model):
     """
@@ -8,7 +9,16 @@ class CompanyData(models.Model):
     """
     
     company_name = models.CharField(max_length=266, verbose_name="Nombre de la empresa")
-    company_logo = models.CharField(max_length=255, blank=True, null=True, verbose_name="Logo de la empresa")
+    company_logo = models.ImageField(
+        upload_to="company_logos/",
+        blank=True,
+        null=True,
+        verbose_name="Logo de la empresa",
+        validators=[
+            # Extensiones permitidas (puedes ampliar la lista si quieres)
+            FileExtensionValidator(allowed_extensions=["jpg", "jpeg", "png", "gif", "webp"])
+        ],
+    )
     
     # Campos de auditoría
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")

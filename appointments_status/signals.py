@@ -1,55 +1,63 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
+from django.db import transaction
 from .models import Appointment, Ticket
-import uuid
-
 
 @receiver(post_save, sender=Appointment)
 def create_ticket_for_appointment(sender, instance, created, **kwargs):
     """
-    Signal que se ejecuta después de crear una cita para crear automáticamente un ticket.
+    Al crear una cita, genera ticket y asigna ticket_number a la cita.
     """
-    if created:
-        # Generar número de ticket único
-        ticket_number = generate_unique_ticket_number()
-        
-        # Crear el ticket automáticamente
+    if not created:
+        return
+
+    ticket_number = generate_unique_ticket_number()  # string
+
+    with transaction.atomic():
         Ticket.objects.create(
             appointment=instance,
             ticket_number=ticket_number,
-            amount=instance.payment or 0.00,  # Usar el pago de la cita o 0 por defecto
-            payment_method='efectivo',  # Método por defecto
+            amount=instance.payment or 0,
+            payment_method='efectivo',
             description=f'Ticket generado automáticamente para cita #{instance.id}',
-            status='pending'
+            status='pending',
         )
-        
-        # Actualizar el número de ticket en la cita
-        instance.ticket_number = ticket_number
-        instance.save(update_fields=['ticket_number'])
+        # IMPORTANTE: update() para no disparar otro post_save
+        Appointment.objects.filter(pk=instance.pk).update(ticket_number=ticket_number)
 
 
-def generate_unique_ticket_number():
+def generate_unique_ticket_number() -> str:
     """
-    Genera un número de ticket único basado en timestamp.
+    Ticket legible basado en timestamp + microsegundos (string).
+    18 dígitos aprox. (cómodo para VARCHAR(20)).
     """
-    from datetime import datetime
-    timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-    return int(timestamp)
+    now = timezone.now()
+    # Ej: 20250829 163303 123456  -> '20250829163303123456'
+    return f"{now.strftime('%Y%m%d%H%M%S')}{now.microsecond:06d}"
 
 
 @receiver(post_save, sender=Appointment)
 def update_ticket_when_appointment_changes(sender, instance, created, **kwargs):
     """
-    Signal que se ejecuta cuando se actualiza una cita para sincronizar con el ticket.
+    Si cambia el pago de la cita, sincroniza el ticket existente.
     """
-    if not created and instance.ticket_number:
-        try:
-            ticket = Ticket.objects.get(appointment=instance)
-            # Actualizar el monto del ticket si cambió el pago de la cita
-            if instance.payment and ticket.amount != instance.payment:
-                ticket.amount = instance.payment
-                ticket.save(update_fields=['amount', 'updated_at'])
-        except Ticket.DoesNotExist:
-            # Si no existe el ticket, crearlo
-            create_ticket_for_appointment(sender, instance, False, **kwargs)
+    if created:
+        return
+    try:
+        ticket = Ticket.objects.get(appointment=instance)
+    except Ticket.DoesNotExist:
+        # Si por alguna razón no existe, lo creamos sin volver a hacer save() en la cita
+        Ticket.objects.create(
+            appointment=instance,
+            ticket_number=instance.ticket_number or generate_unique_ticket_number(),
+            amount=instance.payment or 0,
+            payment_method='efectivo',
+            description=f'Ticket autogenerado por sincronización para cita #{instance.id}',
+            status='pending',
+        )
+        return
+
+    if instance.payment is not None and ticket.amount != instance.payment:
+        ticket.amount = instance.payment
+        ticket.save(update_fields=['amount', 'updated_at'])

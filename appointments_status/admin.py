@@ -65,9 +65,9 @@ class AppointmentAdmin(admin.ModelAdmin):
     ordering = ['-appointment_date', '-hour']
 
     # 👇 según prefieras
-    raw_id_fields = ['patient', 'therapist', 'history', 'payment_status']
+    raw_id_fields = ['patient', 'therapist', 'history']
     # o bien
-    # autocomplete_fields = ['patient', 'therapist', 'history', 'payment_status']
+    autocomplete_fields = ['payment_status']
 
     fieldsets = (
         ('Información de la Cita', {
@@ -95,7 +95,7 @@ class AppointmentAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         return (super()
                 .get_queryset(request)
-                .select_related('appointment_status', 'patient', 'therapist', 'history', 'payment_status'))
+                .select_related('patient', 'therapist', 'history', 'payment_status'))
 
 
 @admin.register(Ticket)

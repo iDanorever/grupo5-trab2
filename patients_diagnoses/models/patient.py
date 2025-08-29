@@ -9,12 +9,18 @@ class Patient(models.Model):
     
     # Información personal
     document_number = models.CharField(max_length=20, unique=True, verbose_name="Número de documento")
-    paternal_lastname = models.CharField(max_length=150, verbose_name="Apellido paterno")
-    maternal_lastname = models.CharField(max_length=150, verbose_name="Apellido materno")
+    paternal_lastname = models.CharField(
+    max_length=150, null=True, blank=True,
+    db_column="last_name_paternal", verbose_name="Apellido paterno"
+    )
+    maternal_lastname = models.CharField(
+    max_length=150, null=True, blank=True,
+    db_column="last_name_maternal", verbose_name="Apellido materno"
+    )
     name = models.CharField(max_length=150, verbose_name="Nombre")
     personal_reference = models.CharField(max_length=255, blank=True, null=True, verbose_name="Referencia personal")
     birth_date = models.DateTimeField(blank=True, null=True, verbose_name="Fecha de nacimiento")
-    sex = models.CharField(max_length=50, blank=True, null=True, verbose_name="Sexo")
+    sex = models.CharField(max_length=50, blank=True, null=True,db_column="gender", verbose_name="Sexo")
 
     # Información de contacto
     phone1 = models.CharField(max_length=20, blank=True, null=True, verbose_name="Teléfono 1")

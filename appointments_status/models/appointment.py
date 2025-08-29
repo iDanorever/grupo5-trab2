@@ -37,7 +37,7 @@ class Appointment(models.Model):
     social_benefit = models.BooleanField(default=True, verbose_name="Beneficio social")
     payment_detail = models.CharField(max_length=255, blank=True, null=True, verbose_name="Detalle de pago")
     payment = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True, verbose_name="Pago")
-    ticket_number = models.IntegerField(blank=True, null=True, verbose_name="Número de ticket")
+    ticket_number = models.CharField(max_length=20, blank=True, null=True, db_index=True)
     
     # Relaciones
     payment_type = models.ForeignKey('histories_configurations.PaymentType', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Tipo de pago")
