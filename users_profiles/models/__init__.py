@@ -1,1 +1,2 @@
-# from .user import User  # DESHABILITADO TEMPORALMENTE - CONFLICTO CON architect.User
+from .user import User as UserProfile
+from .user_verification_code import UserVerificationCode

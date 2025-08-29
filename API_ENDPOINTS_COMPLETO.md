@@ -910,7 +910,7 @@ Body: (vacío)
   "results": [
     {
       "id": 1,
-      "document_type": "DNI",
+      "document_type_id": "1",
       "document_number": "12345678",
       "first_name": "Ana",
       "last_name_paternal": "García",
@@ -954,7 +954,7 @@ Body: (vacío)
 - **Body (raw JSON):**
   ```json
   {
-    "document_type": "DNI",
+    "document_type_id": "1",
     "document_number": "87654321",
     "first_name": "Carlos",
     "last_name_paternal": "Rodríguez",
@@ -997,7 +997,7 @@ Body: (vacío)
 - **Body (raw JSON):**
   ```json
   {
-    "document_type": "DNI",
+    "document_type_id": "1",
     "document_number": "12345678",
     "first_name": "Ana María",
     "last_name_paternal": "García",
@@ -1017,7 +1017,7 @@ Body: (vacío)
 ```json
 {
   "id": 1,
-  "document_type": "DNI",
+  "document_type_id": "1",
   "document_number": "12345678",
   "first_name": "Ana María",
   "last_name_paternal": "García",
@@ -1055,7 +1055,12 @@ Body: (vacío)
     "Ya existe un terapeuta con este número de documento."
   ]
 }
-```
+```json
+{
+  "document_tyoe_id": [
+    "El tipo de documento seleccionado no existe."
+  ]
+}
 ```json
 {
   "email": [
@@ -1090,7 +1095,7 @@ Body: (vacío)
 ```json
 {
   "id": 1,
-  "document_type": "DNI",
+  "document_type_id": "1",
   "document_number": "12345678",
   "first_name": "Ana María",
   "last_name_paternal": "García",
