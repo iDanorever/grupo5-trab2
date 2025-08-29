@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.db import transaction
 from .models import Appointment, Ticket
+from .services.ticket_service import TicketService
 
 @receiver(post_save, sender=Appointment)
 def create_ticket_for_appointment(sender, instance, created, **kwargs):
@@ -12,7 +13,8 @@ def create_ticket_for_appointment(sender, instance, created, **kwargs):
     if not created:
         return
 
-    ticket_number = generate_unique_ticket_number()  # string
+    ticket_service = TicketService()
+    ticket_number = ticket_service.generate_ticket_number()  # string
 
     with transaction.atomic():
         Ticket.objects.create(
@@ -27,14 +29,15 @@ def create_ticket_for_appointment(sender, instance, created, **kwargs):
         Appointment.objects.filter(pk=instance.pk).update(ticket_number=ticket_number)
 
 
-def generate_unique_ticket_number() -> str:
-    """
-    Ticket legible basado en timestamp + microsegundos (string).
-    18 dígitos aprox. (cómodo para VARCHAR(20)).
-    """
-    now = timezone.now()
-    # Ej: 20250829 163303 123456  -> '20250829163303123456'
-    return f"{now.strftime('%Y%m%d%H%M%S')}{now.microsecond:06d}"
+# Función obsoleta - ahora usa TicketService.generate_ticket_number()
+# def generate_unique_ticket_number() -> str:
+#     """
+#     Ticket legible basado en timestamp + microsegundos (string).
+#     18 dígitos aprox. (cómodo para VARCHAR(20)).
+#     """
+#     now = timezone.now()
+#     # Ej: 20250829 163303 123456  -> '20250829163303123456'
+#     return f"{now.strftime('%Y%m%d%H%M%S')}{now.microsecond:06d}"
 
 
 @receiver(post_save, sender=Appointment)
@@ -48,9 +51,10 @@ def update_ticket_when_appointment_changes(sender, instance, created, **kwargs):
         ticket = Ticket.objects.get(appointment=instance)
     except Ticket.DoesNotExist:
         # Si por alguna razón no existe, lo creamos sin volver a hacer save() en la cita
+        ticket_service = TicketService()
         Ticket.objects.create(
             appointment=instance,
-            ticket_number=instance.ticket_number or generate_unique_ticket_number(),
+            ticket_number=instance.ticket_number or ticket_service.generate_ticket_number(),
             amount=instance.payment or 0,
             payment_method='efectivo',
             description=f'Ticket autogenerado por sincronización para cita #{instance.id}',
