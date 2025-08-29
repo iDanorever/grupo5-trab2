@@ -191,5 +191,5 @@ class AutomaticTicketCreationTest(TestCase):
         
         # Verificar formato
         for number in numbers:
-            self.assertTrue(number.startswith('TICKET-'))
+            self.assertTrue(number.startswith('TKT-'))
             self.assertIn('-', number)
