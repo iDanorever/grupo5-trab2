@@ -28,24 +28,20 @@ class DateParameterSerializer(serializers.Serializer):
             
         return data
 
-
 class TherapistAppointmentSerializer(serializers.Serializer):
-    """Serializa datos de citas por terapeuta."""
-    
     id = serializers.IntegerField()
-    name = serializers.CharField()
-    last_name_paternal = serializers.CharField()
-    last_name_maternal = serializers.CharField()
+    name = serializers.CharField()  # 👈 SIN source, leerá 'name' del dict
+    # Si en tu BD hay nulos en apellidos, permite null / opcional
+    last_name_paternal = serializers.CharField(required=False, allow_null=True, allow_blank=True)
+    last_name_maternal = serializers.CharField(required=False, allow_null=True, allow_blank=True)
     appointments_count = serializers.IntegerField()
     percentage = serializers.FloatField(required=False)
-    
+
     def to_representation(self, instance):
-        """Calcula porcentajes automáticamente."""
         data = super().to_representation(instance)
-        if 'percentage' not in data:
-            # Calcular porcentaje si no viene
-            total = self.context.get('total_appointments', 1)
-            data['percentage'] = (data['appointments_count'] / total) * 100 if total > 0 else 0
+        total = self.context.get('total_appointments', 0) or 0
+        appts = data.get('appointments_count', 0) or 0
+        data['percentage'] = (appts / total * 100) if total > 0 else 0.0
         return data
 
 

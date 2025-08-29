@@ -1,109 +1,122 @@
 from datetime import datetime
 from django.utils.timezone import localtime
-from django.db.models import Count, Q, Sum
+from django.db.models import Count, Q, CharField, Value
+from django.db.models.functions import Concat, TruncDate
 from appointments_status.models.appointment import Appointment
 from therapists.models.therapist import Therapist
-from django.db import models
+
+
+# from django.db import models  # 👈 no se usa
 
 class ReportService:
-    """Responsable exclusivamente de consultas de base de datos para reportes."""
-    
     def get_appointments_count_by_therapist(self, validated_data):
-        """Obtiene el conteo de citas por terapeuta para una fecha dada."""
+        """
+        Conteo de TODAS las citas por terapeuta para una fecha dada.
+        Agrupa desde Appointment para evitar problemas de related_name.
+        """
         query_date = validated_data.get("date")
-        
-        # Consultar terapeutas con la cantidad de citas
-        therapists = (
-            Therapist.objects
-            .annotate(
-                appointments_count=Count(
-                    "appointment",
-                    filter=Q(appointment__appointment_date=query_date)
-                )
+
+        # Si appointment_date es DateField, basta con igualdad.
+        # Si es DateTimeField, usamos TruncDate para comparar el día.
+        # Esta versión funciona en ambos casos (TruncDate ⇒ date-only).
+        qs = (
+            Appointment.objects
+            .filter(therapist__isnull=False)
+            .annotate(day=TruncDate("appointment_date"))
+            .filter(day=query_date)
+            .values(
+                "therapist_id",
+                "therapist__first_name",
+                "therapist__last_name_paternal",
+                "therapist__last_name_maternal",
             )
-            .filter(appointments_count__gt=0)
-            .values("id", "name", "last_name_paternal", "last_name_maternal", "appointments_count")
+            .annotate(appointments_count=Count("id"))
         )
-        
-        # Sumar el total de citas
+
+        therapists = [
+            {
+                "id": row["therapist_id"],
+                "name": f'{row["therapist__first_name"]} {row["therapist__last_name_paternal"] or ""} {row["therapist__last_name_maternal"] or ""}'.strip(),
+                "last_name_paternal": row["therapist__last_name_paternal"],
+                "last_name_maternal": row["therapist__last_name_maternal"],
+                "appointments_count": row["appointments_count"],
+            }
+            for row in qs
+        ]
+
+        # Ordenar por mayor número de citas (como antes)
+        therapists.sort(key=lambda t: (-t["appointments_count"], t["last_name_paternal"] or "", t["last_name_maternal"] or "", t["id"]))
+
         total_appointments = sum(t["appointments_count"] for t in therapists)
-        
+
         return {
-            "therapists_appointments": list(therapists),
-            "total_appointments_count": total_appointments
+            "therapists_appointments": therapists,
+            "total_appointments_count": total_appointments,
         }
-    
+
     def get_patients_by_therapist(self, validated_data):
-        """Obtiene pacientes agrupados por terapeuta para una fecha dada."""
+        """Pacientes agrupados por terapeuta para una fecha dada."""
         query_date = validated_data.get("date")
-        
-        # Consultar citas para la fecha
+
         appointments = (
             Appointment.objects
             .select_related("patient", "therapist")
-            .filter(
-                appointment_date=query_date
-            )
+            .annotate(day=TruncDate("appointment_date"))
+            .filter(day=query_date)
         )
-        
-        # Procesar datos
+
         report = {}
         sin_terapeuta = {
             "therapist_id": "",
             "therapist": "Sin terapeuta asignado",
             "patients": {}
         }
-        
+
         for appointment in appointments:
             patient = appointment.patient
             therapist = appointment.therapist
-            
             if not patient:
                 continue
-            
+
             patient_data = {
                 "patient_id": patient.id,
                 "patient": f"{patient.paternal_lastname} {patient.maternal_lastname or ''} {patient.name}".strip(),
-                "appointments": 1
+                "appointments": 0,
             }
-            
+
             if not therapist:
-                # Paciente sin terapeuta
                 key = patient.id
                 if key not in sin_terapeuta["patients"]:
                     sin_terapeuta["patients"][key] = patient_data
-                else:
-                    sin_terapeuta["patients"][key]["appointments"] += 1
+                sin_terapeuta["patients"][key]["appointments"] += 1
             else:
-                # Paciente con terapeuta
                 t_id = therapist.id
                 if t_id not in report:
                     report[t_id] = {
                         "therapist_id": t_id,
-                        "therapist": f"{therapist.last_name_paternal} {therapist.last_name_maternal or ''} {therapist.name}".strip(),
+                        # usa first_name (no existe 'name' en el modelo)
+                        "therapist": f"{therapist.last_name_paternal} {therapist.last_name_maternal or ''} {therapist.first_name}".strip(),
                         "patients": {}
                     }
                 key = patient.id
                 if key not in report[t_id]["patients"]:
                     report[t_id]["patients"][key] = patient_data
-                else:
-                    report[t_id]["patients"][key]["appointments"] += 1
-        
-        # Agregar pacientes sin terapeuta si existen
+                report[t_id]["patients"][key]["appointments"] += 1
+
+        # Agregar grupo “sin terapeuta” si aplica
         if sin_terapeuta["patients"]:
             report["sinTherapist"] = sin_terapeuta
-        
-        # Convertir diccionarios a listas
-        for therapist_id in report:
+
+        # Convertir dicts de pacientes a listas
+        for therapist_id in list(report.keys()):
             report[therapist_id]["patients"] = list(report[therapist_id]["patients"].values())
-        
+
         return list(report.values())
-    
+
     def get_daily_cash(self, validated_data):
-        """Obtiene el resumen diario de efectivo detallado por cita."""
+        """Resumen diario de efectivo detallado por cita."""
         query_date = validated_data.get("date")
-        
-        # Consultar pagos del día
+
         payments = (
             Appointment.objects
             .filter(
@@ -117,10 +130,9 @@ class ReportService:
                 'payment_type',
                 'payment_type__name'
             )
-            .order_by('-id')  # Ordenar por id descendente para tener las más recientes primero
+            .order_by('-id')
         )
-        
-        # Formatear resultado
+
         result = [
             {
                 "id_cita": p['id'],
@@ -130,15 +142,13 @@ class ReportService:
             }
             for p in payments
         ]
-        
         return result
-    
+
     def get_appointments_between_dates(self, validated_data):
-        """Obtiene citas entre dos fechas dadas."""
+        """Citas entre dos fechas dadas."""
         start_date = validated_data.get("start_date")
         end_date = validated_data.get("end_date")
-        
-        # Consultar citas
+
         appointments = (
             Appointment.objects
             .select_related("patient", "therapist")
@@ -148,19 +158,21 @@ class ReportService:
             )
             .order_by("appointment_date", "hour")
         )
-        
-        # Formatear resultado
+
         result = []
         for app in appointments:
             if not app.patient:
                 continue
-                
+
             patient_name = " ".join(filter(None, [
                 app.patient.paternal_lastname,
                 app.patient.maternal_lastname,
                 app.patient.name
             ]))
-            
+
+            hour_val = app.hour
+            hour_str = hour_val if isinstance(hour_val, str) else (hour_val.strftime("%H:%M") if hour_val else "")
+
             result.append({
                 "appointment_id": app.id,
                 "patient_id": app.patient.id,
@@ -168,7 +180,7 @@ class ReportService:
                 "patient": patient_name,
                 "phone1_patient": app.patient.phone1,
                 "appointment_date": app.appointment_date.strftime("%Y-%m-%d"),
-                "hour": app.hour if isinstance(app.hour, str) else app.hour.strftime("%H:%M")
+                "hour": hour_str,
             })
-        
+
         return result

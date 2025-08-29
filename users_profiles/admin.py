@@ -1,19 +1,12 @@
-# users_profiles/admin.py
-
 from django.contrib import admin
 from django.contrib.admin.sites import NotRegistered
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.db.models import Q
 
-# Import directo al archivo para evitar ambigüedades
 from .models.user_verification_code import UserVerificationCode
 
 User = get_user_model()
-
-# -------------------------------------------------------------------
-# Admin para el CustomUser (AUTH_USER_MODEL = 'users_profiles.User')
-# -------------------------------------------------------------------
 
 # Evita AlreadyRegistered si alguien ya lo registró
 try:
@@ -25,49 +18,62 @@ except NotRegistered:
 @admin.register(User)
 class CustomUserAdmin(BaseUserAdmin):
     """
-    Admin del usuario personalizado.
-    Solo usa campos que sabemos que existen en tu modelo.
+    Admin para el CustomUser sin username/first_name/last_name.
+    USERNAME_FIELD = 'email'
     """
-
+    # === Listado ===
     list_display = (
-        "username",
+        "user_name",          # <- antes 'username'
         "email",
-        "first_name",
+        "name",               # <- antes 'first_name'
         "paternal_lastname",
         "maternal_lastname",
         "sex",
         "is_active",
         "is_staff",
-        "date_joined",
+        "created_at",         # usa tus campos reales
+        "updated_at",
     )
-    list_display_links = ("username", "email")
+    list_display_links = ("user_name", "email")
     list_filter = (
         "is_active",
         "is_staff",
         "is_superuser",
         "sex",
-        "date_joined",
+        "created_at",
+        "updated_at",
     )
     search_fields = (
-        "username",
+        "user_name",
         "email",
-        "first_name",
+        "name",
         "paternal_lastname",
         "maternal_lastname",
+        "document_number",
+        "phone",
     )
-    ordering = ("-updated_at", "-date_joined")
+    ordering = ("-updated_at", "-created_at")
 
+    # === Formularios ===
     fieldsets = (
-        ("Credenciales", {"fields": ("username", "password")}),
+        ("Credenciales", {
+            "fields": ("email", "password")  # <- quita 'username'
+        }),
         ("Información personal", {
             "fields": (
-                "first_name",
+                "user_name",          # <- tu alias de usuario
+                "name",
                 "paternal_lastname",
                 "maternal_lastname",
-                "email",
                 "sex",
                 "photo_url",
                 "phone",
+                "document_type",
+                "document_number",
+                "country",
+                "account_statement",
+                "password_change",
+                "email_verified_at",
             ),
         }),
         ("Permisos", {
@@ -75,30 +81,29 @@ class CustomUserAdmin(BaseUserAdmin):
         }),
         ("Fechas", {
             "classes": ("collapse",),
-            "fields": ("last_login", "date_joined", "updated_at", "deleted_at"),
-        }),
-        ("Identificación", {
-            "classes": ("collapse",),
-            "fields": ("document_type", "document_number"),
+            "fields": ("last_login", "created_at", "updated_at", "deleted_at"),
         }),
     )
 
     add_fieldsets = (
         (None, {
             "classes": ("wide",),
-            "fields": ("username", "email", "password1", "password2"),
+            # BaseUserAdmin respeta esto; como USERNAME_FIELD es 'email',
+            # basta con incluir 'email' aquí. Incluimos también 'user_name'
+            # para capturarlo al crear el usuario.
+            "fields": ("email", "user_name", "password1", "password2"),
         }),
     )
 
-    readonly_fields = ("last_login", "date_joined", "updated_at")
+    readonly_fields = ("last_login", "created_at", "updated_at", "email_verified_at")
+
+    # Opcional: mejora UX en permisos
+    filter_horizontal = ("groups", "user_permissions")
 
 
-# -------------------------------------------------------------------
-# Admin para UserVerificationCode (robusto ante variaciones de campos)
-# Posibles nombres en proyectos distintos:
-#   verification_type|type, target_email|email, is_used|used,
-#   attempts|attempt_count, created_at, expires_at, max_attempts
-# -------------------------------------------------------------------
+# =======================
+# UserVerificationCode
+# =======================
 
 def _get(obj, *names, default="—"):
     for n in names:
@@ -174,49 +179,32 @@ class VerificationTypeListFilter(admin.SimpleListFilter):
 class UserVerificationCodeAdmin(admin.ModelAdmin):
     list_display = (
         "user",
-        col_verification_type,
         "code",
-        col_target_email,
-        col_is_used,
-        col_attempts,
-        col_max_attempts,
-        col_created_at,
-        col_expires_at,
+        "failed_attempts",
+        "locked_until",
+        "expires_at",
+        "created_at",
+        "updated_at",
     )
-    list_filter = (VerificationTypeListFilter, UsedListFilter, "created_at", "expires_at")
-    search_fields = ("user__username", "user__email", "code", "target_email", "email")
+    list_filter = ("expires_at", "created_at", "updated_at")
+    search_fields = (
+        "user__user_name",  # si tu User tiene user_name
+        "user__email",
+        "code",
+    )
     ordering = ("-created_at",)
+    readonly_fields = ("created_at", "updated_at")
+
+    fieldsets = (
+        ("Información Básica", {"fields": ("user", "code")}),
+        ("Estado", {"fields": ("failed_attempts", "locked_until")}),
+        ("Vigencia", {"fields": ("expires_at",)}),
+        ("Auditoría", {"classes": ("collapse",), "fields": ("created_at", "updated_at")}),
+    )
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        try:
-            return qs.select_related("user")
-        except Exception:
-            return qs
-
-    readonly_fields = ("created_at", "expires_at")
-    fieldsets = (
-        ("Información Básica", {
-            "fields": ("user", "code"),
-        }),
-        ("Detalles", {
-            "fields": ("verification_type", "target_email"),
-            "description": "Si tu modelo usa otros nombres (p. ej. 'type' o 'email'), estos campos pueden mostrarse vacíos en admin pero el listado no fallará.",
-        }),
-        ("Estado", {
-            "fields": ("is_used", "attempts", "max_attempts"),
-        }),
-        ("Fechas", {
-            "classes": ("collapse",),
-            "fields": ("created_at", "expires_at"),
-        }),
-    )
-
-    def has_add_permission(self, request):
-        return False
-
-    def has_change_permission(self, request, obj=None):
-        return False
+        return qs.select_related("user")
 
 
 # Configuración del sitio admin
