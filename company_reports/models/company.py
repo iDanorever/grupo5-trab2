@@ -2,10 +2,17 @@ from django.db import models
 from django.conf import settings
 
 class CompanyData(models.Model):
-    company_name = models.CharField(max_length=255, unique=True)
-    company_logo = models.ImageField(upload_to='logos/', null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
-    updated_at = models.DateTimeField(auto_now=True, null=True, blank=True)
+    """
+    Modelo para gestionar los datos de la empresa.
+    Basado en la estructura de la tabla table_company_data de la BD.
+    """
+    
+    company_name = models.CharField(max_length=266, verbose_name="Nombre de la empresa")
+    company_logo = models.CharField(max_length=255, blank=True, null=True, verbose_name="Logo de la empresa")
+    
+    # Campos de auditoría
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Fecha de actualización")
 
     def get_logo_url(self):
         """
@@ -22,6 +29,7 @@ class CompanyData(models.Model):
         return self.company_name
     
     class Meta:
-        verbose_name = "Company Data"
-        verbose_name_plural = "Companies Data"
+        db_table = 'table_company_data'
+        verbose_name = "Datos de la Empresa"
+        verbose_name_plural = "Datos de las Empresas"
         ordering = ['company_name'] 

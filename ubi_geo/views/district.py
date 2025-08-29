@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from rest_framework.viewsets import ReadOnlyModelViewSet
-from ubi_geo.models import District
-from ubi_geo.serializers.location import DistrictSerializer
+from ubi_geo.models.district import District
+from ubi_geo.serializers.district import DistrictSerializer
 
 
 class DistrictViewSet(ReadOnlyModelViewSet):
@@ -11,7 +11,6 @@ class DistrictViewSet(ReadOnlyModelViewSet):
 
     Filtros por querystring:
       - ?province=<id>           -> distritos de esa provincia
-      - ?province_ubigeo=<code>  -> distritos cuyo province.ubigeo_code = code
     """
     serializer_class = DistrictSerializer
 
@@ -19,12 +18,10 @@ class DistrictViewSet(ReadOnlyModelViewSet):
         qs = (
             District.objects
             .select_related("province", "province__region")
+            .filter(deleted_at__isnull=True)
             .order_by("name")
         )
         province_id = self.request.query_params.get("province")
-        province_code = self.request.query_params.get("province_ubigeo")
         if province_id:
             qs = qs.filter(province_id=province_id)
-        if province_code:
-            qs = qs.filter(province__ubigeo_code=province_code)
         return qs

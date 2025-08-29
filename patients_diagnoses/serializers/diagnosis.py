@@ -8,17 +8,17 @@ class DiagnosisSerializer(serializers.ModelSerializer):
     class Meta:
         model = Diagnosis
         fields = [
-            'id', 'code', 'name', 'description',
-            'created_at', 'updated_at'
+            'id', 'code', 'name',
+            'created_at', 'updated_at', 'deleted_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'deleted_at']
 
     def validate_code(self, value):
         """Validar que el código solo contenga letras y números."""
         if not re.match(r'^[A-Za-z0-9]+$', value):
             raise serializers.ValidationError("El código solo debe contener letras y números.")
-        if len(value) > 10:
-            raise serializers.ValidationError("El código no debe superar los 10 caracteres.")
+        if len(value) > 255:
+            raise serializers.ValidationError("El código no debe superar los 255 caracteres.")
         
         # Validar que el código sea único
         if Diagnosis.objects.filter(code=value).exclude(id=self.instance.id if self.instance else None).exists():

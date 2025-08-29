@@ -2,15 +2,21 @@ from django.db import models
 from django.utils import timezone
 
 class PredeterminedPrice(models.Model):
+    """
+    Modelo para gestionar los precios predeterminados.
+    Basado en la estructura de la tabla predetermined_prices de la BD.
+    """
+    
     name = models.CharField(
-        max_length=255,
-        error_messages={'max_length': 'El nombre no debe superar los 255 caracteres.'}
+        max_length=100,
+        verbose_name="Nombre"
     )
-    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    price = models.DecimalField(max_digits=8, decimal_places=2, verbose_name="Precio")
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)  # Nuevo campo
+    # Campos de auditoría
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Fecha de actualización")
+    deleted_at = models.DateTimeField(blank=True, null=True, verbose_name="Fecha de eliminación")
 
     def soft_delete(self):
         self.deleted_at = timezone.now()
@@ -25,3 +31,6 @@ class PredeterminedPrice(models.Model):
 
     class Meta:
         db_table = "predetermined_prices"
+        verbose_name = "Precio Predeterminado"
+        verbose_name_plural = "Precios Predeterminados"
+        ordering = ['name']

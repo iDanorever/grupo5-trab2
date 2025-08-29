@@ -10,7 +10,7 @@ User = get_user_model()
 
 
 class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True, write_only=True)
+    email = serializers.CharField(max_length=255, required=True, write_only=True)
     password = serializers.CharField(required=True, write_only=True)
 
     def validate(self, data):
@@ -20,7 +20,7 @@ class LoginSerializer(serializers.Serializer):
         if not email or not password:
             raise serializers.ValidationError(_('Se requieres email y contraseña.'))
 
-        user = authenticate(request=self.context.get('request'), username=email, password=password)
+        user = authenticate(request=self.context.get('request'), user_name=email, password=password)
 
         if user is None:
             raise AuthenticationFailed(_('Credenciales inválidas.'))
@@ -41,11 +41,11 @@ class LoginSerializer(serializers.Serializer):
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, min_length=8)
     password_confirm = serializers.CharField(write_only=True, required=True)
-    username = serializers.CharField(required=True, max_length=150)
+    user_name = serializers.CharField(required=True, max_length=150)
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password', 'password_confirm')
+        fields = ('user_name', 'email', 'password', 'password_confirm')
 
     def validate_password(self, value):
         # Validación personalizada de contraseña

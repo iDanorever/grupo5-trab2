@@ -1,4 +1,4 @@
-from ..models import PredeterminedPrice
+from ..models.predetermined_price import PredeterminedPrice
 
 def list_active():
     return PredeterminedPrice.objects.filter(deleted_at__isnull=True)

@@ -33,7 +33,7 @@ class TherapistAppointmentSerializer(serializers.Serializer):
     """Serializa datos de citas por terapeuta."""
     
     id = serializers.IntegerField()
-    first_name = serializers.CharField()
+    name = serializers.CharField()
     last_name_paternal = serializers.CharField()
     last_name_maternal = serializers.CharField()
     appointments_count = serializers.IntegerField()
@@ -80,9 +80,9 @@ class AppointmentRangeSerializer(serializers.Serializer):
     patient_id = serializers.IntegerField()
     document_number_patient = serializers.CharField()
     patient = serializers.CharField()
-    primary_phone_patient = serializers.CharField()
+    phone1_patient = serializers.CharField()
     appointment_date = serializers.DateField(format='%Y-%m-%d')
-    appointment_hour = serializers.TimeField(format='%H:%M')
+    hour = serializers.TimeField(format='%H:%M')
 
 
 class ReportResponseSerializer(serializers.Serializer):

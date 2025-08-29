@@ -1,64 +1,70 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth import get_user_model
-from .models import UserProfile, UserVerificationCode
+from .models.user_verification_code import UserVerificationCode
 
 User = get_user_model()
 
 
-# No registramos User aquí porque Django ya lo registra automáticamente
-# Si necesitas personalizar el admin de User, puedes hacerlo en settings.py
-# o crear un admin personalizado sin usar @admin.register
-
-
-@admin.register(UserProfile)
-class UserProfileAdmin(admin.ModelAdmin):
-    """Administración para el modelo UserProfile"""
+# Configuración personalizada para el modelo User
+class CustomUserAdmin(BaseUserAdmin):
+    """Administración personalizada para el modelo User"""
     
     list_display = [
-        'user', 'first_name', 'paternal_lastname', 'maternal_lastname',
-        'gender', 'email', 'is_public', 'created_at', 'updated_at'
+        'user_name', 'name', 'paternal_lastname', 'maternal_lastname',
+        'email', 'account_statement', 'is_active', 'date_joined'
     ]
     
     list_filter = [
-        'gender', 'is_public', 'show_email', 'show_phone',
-        'receive_notifications', 'created_at', 'updated_at'
+        'account_statement', 'is_active', 'is_staff', 'is_superuser',
+        'date_joined', 'last_login', 'deleted_at'
     ]
     
     search_fields = [
-        'user__username', 'user__email', 'first_name',
-        'paternal_lastname', 'maternal_lastname'
+        'user_name', 'email', 'name', 'paternal_lastname', 'maternal_lastname',
+        'document_number'
     ]
     
-    ordering = ['-updated_at']
+    ordering = ['-date_joined']
     
     fieldsets = (
-        ('Usuario', {
-            'fields': ('user',)
+        ('Información de Cuenta', {
+            'fields': ('user_name', 'password', 'account_statement')
         }),
         ('Información Personal', {
             'fields': (
-                'first_name', 'paternal_lastname', 'maternal_lastname',
-                'gender', 'email'
+                'name', 'paternal_lastname', 'maternal_lastname',
+                'sex', 'email', 'phone', 'photo_url'
             )
         }),
-        ('Configuración', {
-            'fields': (
-                'is_public', 'show_email', 'show_phone',
-                'receive_notifications'
-            )
+        ('Información de Documento', {
+            'fields': ('document_number', 'document_type', 'country')
         }),
-        ('Fechas', {
-            'fields': ('created_at', 'updated_at'),
+        ('Permisos', {
+            'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'),
+        }),
+        ('Fechas importantes', {
+            'fields': ('last_login', 'date_joined', 'deleted_at'),
             'classes': ('collapse',)
         }),
     )
     
-    readonly_fields = ['created_at', 'updated_at']
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('user_name', 'name', 'paternal_lastname', 'maternal_lastname', 'email', 'password1', 'password2'),
+        }),
+    )
     
-    def get_queryset(self, request):
-        """Optimiza las consultas del admin"""
-        return super().get_queryset(request).select_related('user')
+    readonly_fields = ['last_login', 'date_joined', 'deleted_at']
+
+
+# Registrar el admin personalizado
+try:
+    admin.site.unregister(User)
+except admin.sites.NotRegistered:
+    pass
+admin.site.register(User, CustomUserAdmin)
 
 
 @admin.register(UserVerificationCode)
@@ -67,14 +73,14 @@ class UserVerificationCodeAdmin(admin.ModelAdmin):
     
     list_display = [
         'user', 'verification_type', 'code', 'target_email',
-        'is_used', 'attempts', 'created_at', 'expires_at'
+        'is_used', 'failed_attempts', 'created_at', 'expires_at'
     ]
     
     list_filter = [
         'verification_type', 'is_used', 'created_at', 'expires_at'
     ]
     
-    search_fields = ['user__username', 'user__email', 'code', 'target_email']
+    search_fields = ['user__user_name', 'user__email', 'code', 'target_email']
     
     ordering = ['-created_at']
     
@@ -83,7 +89,7 @@ class UserVerificationCodeAdmin(admin.ModelAdmin):
             'fields': ('user', 'verification_type', 'code', 'target_email')
         }),
         ('Estado', {
-            'fields': ('is_used', 'attempts', 'max_attempts')
+            'fields': ('is_used', 'failed_attempts', 'max_attempts')
         }),
         ('Fechas', {
             'fields': ('created_at', 'expires_at'),
@@ -107,6 +113,6 @@ class UserVerificationCodeAdmin(admin.ModelAdmin):
 
 
 # Configuración del sitio admin
-admin.site.site_header = "Administración de Perfiles de Usuario"
-admin.site.site_title = "Perfiles de Usuario"
+admin.site.site_header = "Administración de Usuarios"
+admin.site.site_title = "Usuarios"
 admin.site.index_title = "Panel de Administración"

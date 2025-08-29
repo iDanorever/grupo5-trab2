@@ -1,12 +1,13 @@
 from django.urls import path
-from .views import history, document_types_list, document_type_create, document_type_delete
-from .views import payment_types_list, payment_type_create, payment_type_delete, payment_type_edit # Importa las vistas de PaymentType
+from .views.history import histories_list, history_create, history_delete
+from .views.document_type import document_types_list, document_type_create, document_type_delete
+from .views.payment_type import payment_types_list, payment_type_create, payment_type_delete, payment_type_edit
 
 urlpatterns = [
     # Solo las rutas que existen
-    path("histories/", history.histories_list, name="histories_list"),
-    path("histories/create/", history.history_create, name="history_create"),
-    path("histories/<int:pk>/delete/", history.history_delete, name="history_delete"),
+    path("histories/", histories_list, name="histories_list"),
+    path("histories/create/", history_create, name="history_create"),
+    path("histories/<int:pk>/delete/", history_delete, name="history_delete"),
 
     path("document_types/", document_types_list, name="document_types_list"),  # Para listar tipos de documento
     path("document_types/create/", document_type_create, name="document_type_create"),  # Para crear un tipo de documento

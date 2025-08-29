@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from ubi_geo.models import Province, Region
+from ubi_geo.models.province import Province
 
 
 class ProvinceSerializer(serializers.ModelSerializer):
@@ -9,20 +9,14 @@ class ProvinceSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Province
-        fields = ['id', 'name', 'ubigeo_code', 'region', 'region_name']
-        read_only_fields = ['id', 'region_name']
+        fields = ['id', 'name', 'region', 'region_name', 'created_at', 'updated_at', 'deleted_at']
+        read_only_fields = ['id', 'region_name', 'created_at', 'updated_at', 'deleted_at']
     
     def validate_name(self, value):
         """Validar que el nombre no esté vacío"""
         if not value or not value.strip():
             raise serializers.ValidationError("El nombre de la provincia no puede estar vacío")
         return value.strip()
-    
-    def validate_ubigeo_code(self, value):
-        """Validar el código de la provincia"""
-        if not value or not value.strip():
-            raise serializers.ValidationError("El código de la provincia no puede estar vacío")
-        return value.strip().upper()
     
     def validate_region(self, value):
         """Validar que la región exista"""

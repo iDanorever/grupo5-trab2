@@ -17,8 +17,8 @@ class MedicalRecordService:
                 Q(patient__name__icontains=search) |
                 Q(patient__paternal_lastname__icontains=search) |
                 Q(patient__document_number__icontains=search) |
-                Q(diagnosis__name__icontains=search) |
-                Q(diagnosis__code__icontains=search) |
+                Q(diagnose__name__icontains=search) |
+                Q(diagnose__code__icontains=search) |
                 Q(symptoms__icontains=search) |
                 Q(treatment__icontains=search)
             )
@@ -27,8 +27,8 @@ class MedicalRecordService:
         if filters:
             if filters.get('patient_id'):
                 queryset = queryset.filter(patient_id=filters['patient_id'])
-            if filters.get('diagnosis_id'):
-                queryset = queryset.filter(diagnosis_id=filters['diagnosis_id'])
+            if filters.get('diagnose_id'):
+                queryset = queryset.filter(diagnose_id=filters['diagnose_id'])
             if filters.get('status'):
                 queryset = queryset.filter(status=filters['status'])
             if filters.get('date_from'):
@@ -137,7 +137,7 @@ class MedicalRecordService:
         
         stats = MedicalRecord.objects.filter(
             deleted_at__isnull=True
-        ).values('diagnosis__name').annotate(
+        ).values('diagnose__name').annotate(
             count=Count('id')
         ).order_by('-count')[:10]
         

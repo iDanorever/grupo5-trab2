@@ -215,9 +215,9 @@ class ExcelExportView:
             worksheet.write(row, 0, appointment['patient_id'])
             worksheet.write(row, 1, appointment['document_number_patient'])
             worksheet.write(row, 2, appointment['patient'])
-            worksheet.write(row, 3, appointment['primary_phone_patient'])
+            worksheet.write(row, 3, appointment['phone1_patient'])
             worksheet.write(row, 4, appointment['appointment_date'])
-            worksheet.write(row, 5, appointment['appointment_hour'])
+            worksheet.write(row, 5, appointment['hour'])
         
         # Ajustar anchos de columna
         worksheet.set_column('A:A', 12)  # ID Paciente
@@ -268,7 +268,7 @@ class ExcelExportView:
         # Escribir datos
         for row, appointment in enumerate(data, start=1):
             worksheet.write(row, 0, appointment.get('appointment_date', ''))
-            worksheet.write(row, 1, appointment.get('appointment_hour', ''))
+            worksheet.write(row, 1, appointment.get('hour', ''))
             worksheet.write(row, 2, appointment.get('therapist', ''))
             worksheet.write(row, 3, appointment.get('patient', ''))
             worksheet.write(row, 4, float(appointment.get('payment', 0)))

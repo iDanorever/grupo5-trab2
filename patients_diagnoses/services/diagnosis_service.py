@@ -15,8 +15,7 @@ class DiagnosisService:
         if search:
             queryset = queryset.filter(
                 Q(code__icontains=search) |
-                Q(name__icontains=search) |
-                Q(description__icontains=search)
+                Q(name__icontains=search)
             )
         
         # Ordenar por código

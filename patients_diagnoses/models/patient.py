@@ -2,46 +2,46 @@ from django.db import models
 from django.utils import timezone
 
 class Patient(models.Model):
+    """
+    Modelo para gestionar los pacientes.
+    Basado en la estructura de la tabla patients de la BD.
+    """
+    
     # Información personal
-    document_number = models.CharField(max_length=20, unique=True)
-    paternal_lastname = models.CharField(max_length=100)
-    maternal_lastname = models.CharField(max_length=100)
-    name = models.CharField(max_length=100)
-    personal_reference = models.CharField(max_length=100, blank=True, null=True)
-    birth_date = models.DateField()
-    sex = models.CharField(max_length=10, choices=[
-        ('M', 'Masculino'),
-        ('F', 'Femenino'),
-        ('O', 'Otro')
-    ])
+    document_number = models.CharField(max_length=20, unique=True, verbose_name="Número de documento")
+    paternal_lastname = models.CharField(max_length=150, verbose_name="Apellido paterno")
+    maternal_lastname = models.CharField(max_length=150, verbose_name="Apellido materno")
+    name = models.CharField(max_length=150, verbose_name="Nombre")
+    personal_reference = models.CharField(max_length=255, blank=True, null=True, verbose_name="Referencia personal")
+    birth_date = models.DateTimeField(blank=True, null=True, verbose_name="Fecha de nacimiento")
+    sex = models.CharField(max_length=50, blank=True, null=True, verbose_name="Sexo")
 
     # Información de contacto
-    primary_phone = models.CharField(max_length=15)
-    secondary_phone = models.CharField(max_length=15, blank=True, null=True)
-    email = models.EmailField(blank=True, null=True)
+    phone1 = models.CharField(max_length=20, blank=True, null=True, verbose_name="Teléfono 1")
+    phone2 = models.CharField(max_length=20, blank=True, null=True, verbose_name="Teléfono 2")
+    email = models.CharField(max_length=254, verbose_name="Email")
 
     # Información adicional
-    ocupation = models.CharField(max_length=100, blank=True, null=True)
-    health_condition = models.TextField(blank=True, null=True)
-    address = models.CharField(max_length=255)
+    ocupation = models.CharField(max_length=100, verbose_name="Ocupación")
+    health_condition = models.TextField(verbose_name="Condición de salud")
+    address = models.TextField(blank=True, null=True, verbose_name="Dirección")
 
     # Relaciones con otras apps
-    # (Ahora referenciadas explícitamente a la app ubi_geo para evitar E300/E307)
-    region = models.ForeignKey('ubi_geo.Region', on_delete=models.PROTECT, related_name='medical_patients')
-    province = models.ForeignKey('ubi_geo.Province', on_delete=models.PROTECT, related_name='medical_patients')
-    district = models.ForeignKey('ubi_geo.District', on_delete=models.PROTECT, related_name='medical_patients')
+    region = models.ForeignKey('ubi_geo.Region', on_delete=models.CASCADE, verbose_name="Región")
+    province = models.ForeignKey('ubi_geo.Province', on_delete=models.CASCADE, verbose_name="Provincia")
+    district = models.ForeignKey('ubi_geo.District', on_delete=models.CASCADE, verbose_name="Distrito")
 
     # Usando el modelo de DocumentType de histories_configurations
     document_type = models.ForeignKey(
         'histories_configurations.DocumentType',
-        on_delete=models.PROTECT,
-        related_name='medical_patients'
+        on_delete=models.CASCADE,
+        verbose_name="Tipo de documento"
     )
 
     # Campos de auditoría
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Fecha de actualización")
+    deleted_at = models.DateTimeField(null=True, blank=True, verbose_name="Fecha de eliminación")
 
     class Meta:
         db_table = 'patients'

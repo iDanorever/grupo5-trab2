@@ -6,7 +6,7 @@ from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
-from ..models.verification import UserVerificationCode
+from ..models.user_verification_code import UserVerificationCode
 
 User = get_user_model()
 

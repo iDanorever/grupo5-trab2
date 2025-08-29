@@ -1,7 +1,7 @@
-from ..models import History
+from ..models.history import History
 
 def list_active():
-    return History.active.all()
+    return History.objects.filter(deleted_at__isnull=True)
 
 def create(**kwargs):
     return History.objects.create(**kwargs)

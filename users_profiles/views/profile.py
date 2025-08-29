@@ -2,12 +2,14 @@ from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.shortcuts import get_object_or_404
-from ..models import UserProfile
+from django.contrib.auth import get_user_model
 from ..serializers.profile import (
     ProfileSerializer, ProfileUpdateSerializer, ProfileCreateSerializer,
     PublicProfileSerializer, ProfileSettingsSerializer
 )
 from django.db import models
+
+User = get_user_model()
 
 
 class ProfileDetailView(generics.RetrieveUpdateAPIView):
@@ -22,18 +24,8 @@ class ProfileDetailView(generics.RetrieveUpdateAPIView):
         return ProfileUpdateSerializer
     
     def get_object(self):
-        """Obtiene o crea el perfil del usuario"""
-        profile, created = UserProfile.objects.get_or_create(
-            user=self.request.user,
-            defaults={
-                'first_name': self.request.user.first_name or '',
-                'paternal_lastname': self.request.user.last_name or '',
-                'maternal_lastname': '',
-                'email': self.request.user.email,
-                'gender': 'P'
-            }
-        )
-        return profile
+        """Obtiene el usuario autenticado"""
+        return self.request.user
     
     def update(self, request, *args, **kwargs):
         """Actualiza el perfil del usuario"""
@@ -57,7 +49,7 @@ class ProfileCreateView(generics.CreateAPIView):
     
     def perform_create(self, serializer):
         """Crea el perfil asociado al usuario autenticado"""
-        serializer.save(user=self.request.user)
+        serializer.save()
     
     def create(self, request, *args, **kwargs):
         """Crea el perfil y retorna la respuesta"""
@@ -76,15 +68,15 @@ class PublicProfileView(generics.RetrieveAPIView):
     
     serializer_class = PublicProfileSerializer
     permission_classes = [permissions.AllowAny]
-    queryset = UserProfile.objects.filter(is_public=True)
+    queryset = User.objects.filter(is_active=True)
     
     def get_object(self):
-        """Retorna el perfil por username"""
-        username = self.kwargs.get('username')
+        """Retorna el usuario por username"""
+        user_name = self.kwargs.get('user_name')
         return get_object_or_404(
-            UserProfile,
-            user__username=username,
-            is_public=True
+            User,
+            user_name=user_name,
+            is_active=True
         )
 
 
@@ -95,18 +87,8 @@ class ProfileSettingsView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_object(self):
-        """Obtiene el perfil del usuario"""
-        profile, created = UserProfile.objects.get_or_create(
-            user=self.request.user,
-            defaults={
-                'first_name': self.request.user.first_name or '',
-                'paternal_lastname': self.request.user.last_name or '',
-                'maternal_lastname': '',
-                'email': self.request.user.email,
-                'gender': 'P'
-            }
-        )
-        return profile
+        """Obtiene el usuario autenticado"""
+        return self.request.user
     
     def update(self, request, *args, **kwargs):
         """Actualiza las configuraciones del perfil"""
@@ -129,37 +111,31 @@ class ProfileCompletionView(APIView):
     
     def get(self, request):
         """Retorna el porcentaje de completitud del perfil"""
-        profile, created = UserProfile.objects.get_or_create(
-            user=request.user,
-            defaults={
-                'first_name': request.user.first_name or '',
-                'paternal_lastname': request.user.last_name or '',
-                'maternal_lastname': '',
-                'email': request.user.email,
-                'gender': 'P'
-            }
-        )
+        user = request.user
         
-        completion_percentage = profile.get_completion_percentage()
+        # Calcular completitud del perfil
+        required_fields = ['name', 'email', 'phone']
+        completed_fields = sum(1 for field in required_fields if getattr(user, field))
+        completion_percentage = (completed_fields / len(required_fields)) * 100
         
         return Response({
             'completion_percentage': completion_percentage,
-            'is_complete': profile.is_complete(),
-            'missing_fields': self._get_missing_fields(profile)
+            'is_complete': completion_percentage >= 80,
+            'missing_fields': self._get_missing_fields(user)
         })
     
-    def _get_missing_fields(self, profile):
+    def _get_missing_fields(self, user):
         """Retorna los campos que faltan para completar el perfil"""
         missing = []
         
-        if not profile.first_name:
-            missing.append('first_name')
-        if not profile.paternal_lastname:
-            missing.append('paternal_lastname')
-        if not profile.gender or profile.gender == 'P':
-            missing.append('gender')
-        if not profile.user.profile_photo:
-            missing.append('profile_photo')
+        if not user.name:
+            missing.append('name')
+        if not user.email:
+            missing.append('email')
+        if not user.phone:
+            missing.append('phone')
+        if not user.photo_url:
+            missing.append('photo_url')
         
         return missing
 
@@ -169,34 +145,29 @@ class ProfileSearchView(generics.ListAPIView):
     
     serializer_class = PublicProfileSerializer
     permission_classes = [permissions.AllowAny]
-    queryset = UserProfile.objects.filter(is_public=True)
+    queryset = User.objects.filter(is_active=True)
     
     def get_queryset(self):
-        """Filtra perfiles según parámetros de búsqueda"""
+        """Filtra usuarios según parámetros de búsqueda"""
         queryset = super().get_queryset()
         
         # Búsqueda por nombre
         name_query = self.request.query_params.get('name', None)
         if name_query:
             queryset = queryset.filter(
-                models.Q(first_name__icontains=name_query) |
+                models.Q(name__icontains=name_query) |
                 models.Q(paternal_lastname__icontains=name_query) |
                 models.Q(maternal_lastname__icontains=name_query)
             )
         
         # Filtro por género
-        gender = self.request.query_params.get('gender', None)
-        if gender:
-            queryset = queryset.filter(gender=gender)
+        sex = self.request.query_params.get('sex', None)
+        if sex:
+            queryset = queryset.filter(sex=sex)
         
         # Filtro por país
         country = self.request.query_params.get('country', None)
         if country:
-            queryset = queryset.filter(user__country__icontains=country)
-        
-        # Filtro por ciudad
-        city = self.request.query_params.get('city', None)
-        if city:
-            queryset = queryset.filter(user__city__icontains=city)
+            queryset = queryset.filter(country__name__icontains=country)
         
         return queryset[:50]  # Limitar a 50 resultados

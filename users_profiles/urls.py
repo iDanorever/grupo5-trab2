@@ -1,19 +1,9 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import (
-    # User views
-    UserDetailView, UserUpdateView, UserProfilePhotoView, UserSearchView, UserProfileView,
-    # Profile views
-    ProfileDetailView, ProfileCreateView, PublicProfileView, 
-    ProfileSettingsView, ProfileCompletionView, ProfileSearchView,
-    # Password views
-    PasswordChangeView, PasswordResetView, PasswordResetConfirmView, 
-    PasswordStrengthView, PasswordHistoryView, PasswordPolicyView,
-    # Verification views
-    VerificationCodeView, EmailChangeView, EmailChangeConfirmView, 
-    VerificationCodeResendView, VerificationStatusView, EmailVerificationView, 
-    EmailVerificationConfirmView
-)
+from .views.user import UserDetailView, UserUpdateView, UserProfilePhotoView, UserSearchView, UserProfileView
+from .views.profile import ProfileDetailView, ProfileCreateView, PublicProfileView, ProfileSettingsView, ProfileCompletionView, ProfileSearchView
+from .views.password import PasswordChangeView, PasswordResetView, PasswordResetConfirmView, PasswordStrengthView, PasswordHistoryView, PasswordPolicyView
+from .views.verification import VerificationCodeView, EmailChangeView, EmailChangeConfirmView, VerificationCodeResendView, VerificationStatusView, EmailVerificationView, EmailVerificationConfirmView
 
 # Create router for viewsets
 router = DefaultRouter()
@@ -30,7 +20,7 @@ urlpatterns = [
     # Profile management
     path('profiles/me/', ProfileDetailView.as_view(), name='profile-detail'),
     path('profiles/create/', ProfileCreateView.as_view(), name='profile-create'),
-    path('profiles/public/<str:username>/', PublicProfileView.as_view(), name='public-profile'),
+    path('profiles/public/<str:user_name>/', PublicProfileView.as_view(), name='public-profile'),
     path('profiles/settings/', ProfileSettingsView.as_view(), name='profile-settings'),
     path('profiles/completion/', ProfileCompletionView.as_view(), name='profile-completion'),
     path('profiles/search/', ProfileSearchView.as_view(), name='profile-search'),

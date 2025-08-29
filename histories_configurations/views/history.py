@@ -1,18 +1,19 @@
 import json
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
-from ..models import History, DocumentType
+from ..models.history import History
+from ..models.document_type import DocumentType
 
 @csrf_exempt
 def histories_list(request):
     if request.method != "GET":
         return HttpResponseNotAllowed(["GET"])
     
-    qs = History.objects.filter(deleted_at__isnull=True).select_related("document_type")
+    qs = History.objects.filter(deleted_at__isnull=True).select_related("patient")
     data = [{
         "id": h.id,
-        "document_type": h.document_type_id,
-        "document_number": h.document_number
+        "patient": h.patient_id,
+        "patient_name": f"{h.patient.name} {h.patient.paternal_lastname}" if h.patient else None
     } for h in qs]
     return JsonResponse({"histories": data})
 
@@ -28,34 +29,26 @@ def history_create(request):
     except json.JSONDecodeError:
         return JsonResponse({"error": "JSON inválido"}, status=400)
     
-    dt_id = payload.get("document_type")
-    document_number = payload.get("document_number")
+    patient_id = payload.get("patient")
 
     # Validar campos obligatorios
-    if dt_id is None or not document_number:
+    if patient_id is None:
         return JsonResponse({"error": "Campos obligatorios faltantes"}, status=400)
 
-    
-    try:
-        dt = DocumentType.objects.get(pk=dt_id)
-    except DocumentType.DoesNotExist:
-        return JsonResponse({"error": "document_type inválido"}, status=400)
-    
-    # Verificar si ya existe un historial activo con esta combinación
+    # Verificar si ya existe un historial activo para este paciente
     existing_history = History.objects.filter(
-        document_type=dt,
-        document_number=document_number,
+        patient_id=patient_id,
         deleted_at__isnull=True
     ).first()
     
     if existing_history:
         return JsonResponse({
-            "error": "Ya existe un historial activo con este tipo de documento y número",
+            "error": "Ya existe un historial activo para este paciente",
             "existing_history_id": existing_history.id
         }, status=409)
     
     try:
-        h = History.objects.create(document_type=dt, document_number=document_number)
+        h = History.objects.create(patient_id=patient_id)
         return JsonResponse({"id": h.id}, status=201)
     except Exception as e:
         return JsonResponse({"error": "Error al crear el historial"}, status=500)

@@ -21,8 +21,8 @@ class MedicalRecordListCreateAPIView(generics.ListCreateAPIView):
         filters = {}
         if request.GET.get('patient_id'):
             filters['patient_id'] = request.GET.get('patient_id')
-        if request.GET.get('diagnosis_id'):
-            filters['diagnosis_id'] = request.GET.get('diagnosis_id')
+        if request.GET.get('diagnose_id'):
+            filters['diagnose_id'] = request.GET.get('diagnose_id')
         if request.GET.get('status'):
             filters['status'] = request.GET.get('status')
         if request.GET.get('date_from'):

@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
 from django.conf import settings
-from ..models.verification import UserVerificationCode
+from ..models.user_verification_code import UserVerificationCode
 
 User = get_user_model()
 
@@ -85,14 +85,13 @@ class VerificationService:
                 
                 # Marcar email como verificado según el tipo
                 if verification_type == 'email_verification':
-                    user.is_email_verified = True
-                    user.save()
+                    # No hay campo is_email_verified, solo marcar como usado
+                    pass
                 elif verification_type == 'email_change':
                     # Cambiar email si es cambio de email
                     new_email = verification.metadata.get('new_email')
                     if new_email:
                         user.email = new_email
-                        user.is_email_verified = True
                         user.save()
                 
                 # Marcar código como usado
@@ -192,12 +191,13 @@ class VerificationService:
             tuple: (subject, message, html_message)
         """
         base_url = getattr(settings, 'FRONTEND_URL', 'http://localhost:3000')
+        full_name = f"{user.name} {user.paternal_lastname}".strip() if user.name else user.user_name
         
         if verification_type == 'email_verification':
             subject = "Verifica tu email"
             verification_url = f"{base_url}/verify-email?code={verification_code.code}"
             message = f"""
-            Hola {user.get_full_name() or user.username},
+            Hola {full_name},
             
             Gracias por registrarte. Para verificar tu email, haz clic en el siguiente enlace:
             
@@ -210,7 +210,7 @@ class VerificationService:
             
             html_message = f"""
             <h2>Verifica tu email</h2>
-            <p>Hola {user.get_full_name() or user.username},</p>
+            <p>Hola {full_name},</p>
             <p>Gracias por registrarte. Para verificar tu email, haz clic en el siguiente enlace:</p>
             <p><a href="{verification_url}">Verificar Email</a></p>
             <p>Este enlace expirará en 24 horas.</p>
@@ -221,7 +221,7 @@ class VerificationService:
             subject = "Confirma cambio de email"
             verification_url = f"{base_url}/confirm-email-change?code={verification_code.code}"
             message = f"""
-            Hola {user.get_full_name() or user.username},
+            Hola {full_name},
             
             Has solicitado cambiar tu email a: {new_email}
             
@@ -236,7 +236,7 @@ class VerificationService:
             
             html_message = f"""
             <h2>Confirma cambio de email</h2>
-            <p>Hola {user.get_full_name() or user.username},</p>
+            <p>Hola {full_name},</p>
             <p>Has solicitado cambiar tu email a: <strong>{new_email}</strong></p>
             <p>Para confirmar este cambio, haz clic en el siguiente enlace:</p>
             <p><a href="{verification_url}">Confirmar Cambio</a></p>
@@ -248,7 +248,7 @@ class VerificationService:
             subject = "Recupera tu contraseña"
             verification_url = f"{base_url}/reset-password?code={verification_code.code}"
             message = f"""
-            Hola {user.get_full_name() or user.username},
+            Hola {full_name},
             
             Has solicitado recuperar tu contraseña.
             
@@ -263,7 +263,7 @@ class VerificationService:
             
             html_message = f"""
             <h2>Recupera tu contraseña</h2>
-            <p>Hola {user.get_full_name() or user.username},</p>
+            <p>Hola {full_name},</p>
             <p>Has solicitado recuperar tu contraseña.</p>
             <p>Para crear una nueva contraseña, haz clic en el siguiente enlace:</p>
             <p><a href="{verification_url}">Crear Nueva Contraseña</a></p>
@@ -288,7 +288,6 @@ class VerificationService:
             dict: Estado de verificación
         """
         return {
-            'is_email_verified': user.is_email_verified,
             'email': user.email,
             'has_pending_verifications': UserVerificationCode.objects.filter(
                 user=user,

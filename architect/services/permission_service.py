@@ -1,4 +1,4 @@
-from ..models import Permission, Role
+from ..models.permission import Permission, Role
 
 
 class PermissionService:

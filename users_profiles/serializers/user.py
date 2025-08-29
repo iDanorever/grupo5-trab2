@@ -14,24 +14,19 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'id', 'username', 'email', 'first_name', 'last_name',
-            'full_name', 'phone', 'rol', 'is_active', 'date_joined', 'last_login',
-            'profile_photo_url'
+            'id', 'user_name', 'email', 'name', 'paternal_lastname', 'maternal_lastname',
+            'full_name', 'phone', 'account_statement', 'is_active', 'date_joined', 'last_login',
+            'profile_photo_url', 'document_number', 'document_type', 'sex', 'country', 'photo_url'
         ]
-        read_only_fields = ['id', 'username', 'date_joined', 'last_login', 'rol']
+        read_only_fields = ['id', 'user_name', 'date_joined', 'last_login', 'account_statement']
     
     def get_full_name(self, obj):
         """Retorna el nombre completo del usuario"""
-        return obj.get_full_name()
+        return f"{obj.name} {obj.paternal_lastname} {obj.maternal_lastname}".strip()
     
     def get_profile_photo_url(self, obj):
         """Retorna la URL de la foto de perfil"""
-        if obj.profile_photo:
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(obj.profile_photo.url)
-            return obj.profile_photo.url
-        return None
+        return obj.photo_url if obj.photo_url else None
 
 
 class UserUpdateSerializer(serializers.ModelSerializer):
@@ -40,7 +35,7 @@ class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'first_name', 'last_name', 'phone'
+            'name', 'paternal_lastname', 'maternal_lastname', 'phone'
         ]
     
     def validate_phone(self, value):
@@ -76,8 +71,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = [
-            'username', 'email', 'password', 'password_confirm',
-            'first_name', 'last_name'
+            'user_name', 'email', 'password', 'password_confirm',
+            'name', 'paternal_lastname', 'maternal_lastname'
         ]
     
     def validate(self, attrs):
@@ -90,7 +85,7 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Este email ya está registrado")
         
         # Verificar que el username no esté en uso
-        if User.objects.filter(username=attrs['username']).exists():
+        if User.objects.filter(user_name=attrs['user_name']).exists():
             raise serializers.ValidationError("Este nombre de usuario ya está en uso")
         
         return attrs
@@ -105,22 +100,17 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class UserProfilePhotoSerializer(serializers.ModelSerializer):
     """Serializer para actualización de la foto de perfil"""
     
-    profile_photo = serializers.ImageField(
-        max_length=None,
-        allow_empty_file=False,
-        use_url=True
+    photo_url = serializers.CharField(
+        max_length=255,
+        help_text='URL de la foto de perfil'
     )
     
     class Meta:
         model = User
-        fields = ['profile_photo']
+        fields = ['photo_url']
     
     def update(self, instance, validated_data):
         """Actualiza la foto de perfil del usuario"""
-        # Eliminar la foto anterior si existe
-        if instance.profile_photo:
-            instance.profile_photo.delete(save=False)
-        
-        instance.profile_photo = validated_data['profile_photo']
+        instance.photo_url = validated_data['photo_url']
         instance.save()
         return instance

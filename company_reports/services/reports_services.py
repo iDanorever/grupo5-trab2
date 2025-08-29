@@ -22,7 +22,7 @@ class ReportService:
                 )
             )
             .filter(appointments_count__gt=0)
-            .values("id", "first_name", "last_name_paternal", "last_name_maternal", "appointments_count")
+            .values("id", "name", "last_name_paternal", "last_name_maternal", "appointments_count")
         )
         
         # Sumar el total de citas
@@ -80,7 +80,7 @@ class ReportService:
                 if t_id not in report:
                     report[t_id] = {
                         "therapist_id": t_id,
-                        "therapist": f"{therapist.last_name_paternal} {therapist.last_name_maternal or ''} {therapist.first_name}".strip(),
+                        "therapist": f"{therapist.last_name_paternal} {therapist.last_name_maternal or ''} {therapist.name}".strip(),
                         "patients": {}
                     }
                 key = patient.id
@@ -146,7 +146,7 @@ class ReportService:
                 appointment_date__gte=start_date,
                 appointment_date__lte=end_date
             )
-            .order_by("appointment_date", "appointment_hour")
+            .order_by("appointment_date", "hour")
         )
         
         # Formatear resultado
@@ -166,9 +166,9 @@ class ReportService:
                 "patient_id": app.patient.id,
                 "document_number_patient": app.patient.document_number,
                 "patient": patient_name,
-                "primary_phone_patient": app.patient.primary_phone,
+                "phone1_patient": app.patient.phone1,
                 "appointment_date": app.appointment_date.strftime("%Y-%m-%d"),
-                "appointment_hour": app.appointment_hour if isinstance(app.appointment_hour, str) else app.appointment_hour.strftime("%H:%M")
+                "hour": app.hour if isinstance(app.hour, str) else app.hour.strftime("%H:%M")
             })
         
         return result

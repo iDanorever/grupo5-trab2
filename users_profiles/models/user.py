@@ -3,32 +3,41 @@ from django.db import models
 from django.utils import timezone
 
 class User(AbstractUser):
+    """
+    Modelo de usuario personalizado.
+    Basado en la estructura de la tabla users de la BD.
+    """
+    
     # Campos críticos de autenticación
-    document_number = models.CharField(max_length=20, unique=True, verbose_name="Número de documento")
-    email = models.EmailField(unique=True, verbose_name="Correo electrónico")
-    user_name = models.CharField(max_length=50, unique=True, verbose_name="Nombre de usuario")
-    
-    # Campos personales
-    photo_url = models.URLField(blank=True, null=True, verbose_name="URL de foto")
-    name = models.CharField(max_length=100, verbose_name="Nombres")
-    paternal_lastname = models.CharField(max_length=100, verbose_name="Apellido paterno")
-    maternal_lastname = models.CharField(max_length=100, verbose_name="Apellido materno")
-    sex = models.CharField(max_length=1, choices=[('M', 'Masculino'), ('F', 'Femenino'), ('O', 'Otro')], verbose_name="Sexo")
-    phone = models.CharField(max_length=15, blank=True, null=True, verbose_name="Teléfono")
-    
-    # Campos de seguridad y verificación
+    document_number = models.CharField(max_length=255, unique=True, verbose_name="Número de documento")
+    photo_url = models.CharField(max_length=255, blank=True, null=True, verbose_name="URL de foto")
+    name = models.CharField(max_length=255, verbose_name="Nombres")
+    paternal_lastname = models.CharField(max_length=255, verbose_name="Apellido paterno")
+    maternal_lastname = models.CharField(max_length=255, verbose_name="Apellido materno")
+    email = models.CharField(max_length=255, unique=True, verbose_name="Correo electrónico")
+    sex = models.CharField(max_length=1, verbose_name="Sexo")
+    phone = models.CharField(max_length=100, blank=True, null=True, verbose_name="Teléfono")
+    user_name = models.CharField(max_length=150, unique=True, verbose_name="Nombre de usuario")
+    password = models.CharField(max_length=150, verbose_name="Contraseña")
     password_change = models.BooleanField(default=False, verbose_name="Requiere cambio de contraseña")
     last_session = models.DateTimeField(blank=True, null=True, verbose_name="Última sesión")
-    account_statement = models.CharField(max_length=20, default='active', verbose_name="Estado de cuenta")
+    account_statement = models.CharField(max_length=1, default='A', verbose_name="Estado de cuenta")
     email_verified_at = models.DateTimeField(blank=True, null=True, verbose_name="Email verificado en")
-    remember_token = models.CharField(max_length=100, blank=True, null=True, verbose_name="Token de recordatorio")
-    
-    # Relaciones FK (asumiendo que existen estos modelos)
     document_type = models.ForeignKey(
         'histories_configurations.DocumentType',
-        on_delete=models.PROTECT,
-        verbose_name="Tipo de documento"
+        on_delete=models.CASCADE,
+        verbose_name="Tipo de documento",
+        null=True,
+        blank=True
     )
+    country = models.ForeignKey(
+        'ubi_geo.Country',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="País"
+    )
+    remember_token = models.CharField(max_length=100, blank=True, null=True, verbose_name="Token de recordatorio")
 
     # Campos de control
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Creado en")

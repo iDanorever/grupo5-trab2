@@ -1,7 +1,7 @@
 import json
 from django.http import JsonResponse, HttpResponseNotAllowed
 from django.views.decorators.csrf import csrf_exempt
-from ..models import PredeterminedPrice
+from ..models.predetermined_price import PredeterminedPrice
 
 @csrf_exempt
 def predetermined_prices_list(request):

@@ -5,7 +5,7 @@ from ..models import AppointmentStatus
 class AppointmentStatusSerializer(serializers.ModelSerializer):
     """
     Serializer para el modelo AppointmentStatus.
-    Basado en la estructura del módulo Laravel 05_appointments_status.
+    Basado en la estructura actualizada del modelo.
     """
     
     # Campo calculado
@@ -20,9 +20,9 @@ class AppointmentStatusSerializer(serializers.ModelSerializer):
             'appointments_count',
             'created_at',
             'updated_at',
-            'is_active',
+            'deleted_at',
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at', 'appointments_count']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'deleted_at', 'appointments_count']
     
     def validate_name(self, value):
         """Validación personalizada para el nombre del estado"""

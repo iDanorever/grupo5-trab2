@@ -1,14 +1,25 @@
 from django.db import models
-from django.contrib.auth.models import Permission as DjangoPermission
-from .base import BaseModel
 
 
-class Permission(DjangoPermission, BaseModel):
-    detail = models.TextField(blank=True, null=True, verbose_name="Detalle")
+class Permission(models.Model):
+    """
+    Modelo para gestionar los permisos.
+    Basado en la estructura de la tabla permissions de la BD.
+    """
+    
+    name = models.CharField(max_length=255, verbose_name="Nombre")
+    detail = models.CharField(max_length=255, blank=True, null=True, verbose_name="Detalle")
+    guard_name = models.CharField(max_length=255, verbose_name="Guard name")
+    
+    # Campos de auditoría
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Fecha de actualización")
     
     class Meta:
+        db_table = 'permissions'
         verbose_name = "Permiso"
         verbose_name_plural = "Permisos"
+        ordering = ['name']
     
     def __str__(self):
         return self.name
@@ -19,22 +30,27 @@ class RoleEnum(models.TextChoices):
     MEMBER = 'Member', 'Member'
 
 
-class Role(BaseModel):
-    name = models.CharField(
-        max_length=50,
-        choices=RoleEnum.choices,
-        default=RoleEnum.MEMBER,
-        verbose_name="Nombre del Rol"
-    )
-    description = models.TextField(blank=True, null=True, verbose_name="Descripción")
+class Role(models.Model):
+    """
+    Modelo para gestionar los roles.
+    Basado en la estructura de la tabla roles de la BD.
+    """
+    
+    name = models.CharField(max_length=255, blank=True, null=True, verbose_name="Nombre del Rol")
+    guard_name = models.CharField(max_length=255, blank=True, null=True, verbose_name="Guard name")
+    
+    # Campos de auditoría
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Fecha de actualización")
     
     class Meta:
+        db_table = 'roles'
         verbose_name = "Rol"
         verbose_name_plural = "Roles"
         ordering = ['name']
     
     def __str__(self):
-        return self.name
+        return self.name or "Sin nombre"
     
     @classmethod
     def get_admin_role(cls):

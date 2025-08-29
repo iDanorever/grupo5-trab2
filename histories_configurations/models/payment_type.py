@@ -2,29 +2,35 @@ from django.db import models
 from django.utils import timezone
 
 class PaymentType(models.Model):
-    code = models.CharField(
-        max_length=50,
-        error_messages={'max_length': 'El código no debe superar los 50 caracteres.'}
-    )
+    """
+    Modelo para gestionar los tipos de pago.
+    Basado en la estructura de la tabla payment_types de la BD.
+    """
+    
     name = models.CharField(
-        max_length=255,
-        error_messages={'max_length': 'El nombre no debe superar los 255 caracteres.'}
+        max_length=50,
+        unique=True,
+        verbose_name="Nombre"
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
+    # Campos de auditoría
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Fecha de actualización")
+    deleted_at = models.DateTimeField(blank=True, null=True, verbose_name="Fecha de eliminación")
 
     def soft_delete(self):
         self.deleted_at = timezone.now()
-        self.save()
+        self.save(update_fields=["deleted_at"])
 
     def restore(self):
         self.deleted_at = None
-        self.save()
+        self.save(update_fields=["deleted_at"])
 
     def __str__(self):
         return self.name
 
     class Meta:
         db_table = "payment_types"
+        verbose_name = "Tipo de Pago"
+        verbose_name_plural = "Tipos de Pago"
+        ordering = ['name']

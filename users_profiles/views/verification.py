@@ -2,7 +2,7 @@ from rest_framework import generics, status, permissions
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import get_user_model
-from ..models import UserVerificationCode
+from ..models.user_verification_code import UserVerificationCode
 from ..serializers.verification import (
     VerificationCodeSerializer, EmailChangeSerializer,
     EmailChangeConfirmSerializer, VerificationCodeRequestSerializer,
@@ -28,8 +28,7 @@ class VerificationCodeView(APIView):
             # Crear código de verificación
             verification_code = UserVerificationCode.create_code(
                 user=request.user,
-                verification_type=verification_type,
-                target_email=target_email
+                verification_type=verification_type
             )
             
             # Aquí se enviaría el email con el código
@@ -60,8 +59,7 @@ class EmailChangeView(APIView):
             # Crear código de verificación para cambio de email
             verification_code = UserVerificationCode.create_code(
                 user=request.user,
-                verification_type='email_change',
-                target_email=new_email
+                verification_type='email_change'
             )
             
             # Aquí se enviaría el email con el código
@@ -108,11 +106,11 @@ class EmailChangeConfirmView(APIView):
                         'error': 'Demasiados intentos fallidos'
                     }, status=status.HTTP_400_BAD_REQUEST)
                 
-                # Cambiar el email
-                new_email = verification.target_email
-                request.user.email = new_email
-                request.user.email_verified = True
-                request.user.save()
+                # Cambiar el email (asumiendo que el nuevo email está en metadata)
+                new_email = verification.metadata.get('new_email') if verification.metadata else None
+                if new_email:
+                    request.user.email = new_email
+                    request.user.save()
                 
                 # Marcar el código como usado
                 verification.mark_as_used()
@@ -153,8 +151,7 @@ class VerificationCodeResendView(APIView):
             # Crear nuevo código
             verification_code = UserVerificationCode.create_code(
                 user=request.user,
-                verification_type=verification_type,
-                target_email=target_email
+                verification_type=verification_type
             )
             
             # Aquí se enviaría el email con el código
@@ -197,7 +194,6 @@ class VerificationStatusView(APIView):
         
         return Response({
             'user_email': user.email,
-            'email_verified': user.email_verified,
             'active_verifications': verification_status
         })
 
@@ -221,11 +217,6 @@ class EmailVerificationView(APIView):
             
             try:
                 user = User.objects.get(email=email)
-                
-                if user.email_verified:
-                    return Response({
-                        'error': 'Este email ya está verificado'
-                    }, status=status.HTTP_400_BAD_REQUEST)
                 
                 # Crear código de verificación
                 verification_code = UserVerificationCode.create_code(
@@ -279,11 +270,6 @@ class EmailVerificationConfirmView(APIView):
                     return Response({
                         'error': 'Demasiados intentos fallidos'
                     }, status=status.HTTP_400_BAD_REQUEST)
-                
-                # Marcar email como verificado
-                user = verification.user
-                user.email_verified = True
-                user.save()
                 
                 # Marcar el código como usado
                 verification.mark_as_used()

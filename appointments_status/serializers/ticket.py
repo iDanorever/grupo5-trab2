@@ -5,7 +5,7 @@ from ..models import Ticket
 class TicketSerializer(serializers.ModelSerializer):
     """
     Serializer para el modelo Ticket.
-    Basado en la estructura del módulo Laravel 05_appointments_status.
+    Basado en la estructura actualizada del modelo.
     """
     
     # Campos calculados
@@ -34,12 +34,10 @@ class TicketSerializer(serializers.ModelSerializer):
             'is_pending',
             'created_at',
             'updated_at',
-            'is_active',
+            'deleted_at',
         ]
-        read_only_fields = ['id', 'payment_date', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'payment_date', 'created_at', 'updated_at', 'deleted_at']
         
-        # Campo de relación integrado
-    
     def validate_ticket_number(self, value):
         """Validación personalizada para el número de ticket"""
         # Verificar que el número de ticket no esté vacío

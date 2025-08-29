@@ -9,31 +9,25 @@ from histories_configurations.serializers import DocumentTypeSerializer
 
 class TherapistSerializer(serializers.ModelSerializer):
     # Serializadores anidados para mostrar datos completos
-    region_fk = RegionSerializer(read_only=True)
-    province_fk = ProvinceSerializer(read_only=True)
-    district_fk = DistrictSerializer(read_only=True)
+    region = RegionSerializer(read_only=True)
+    province = ProvinceSerializer(read_only=True)
+    district = DistrictSerializer(read_only=True)
     document_type = DocumentTypeSerializer(read_only=True)  # Para lectura
     
     # Campos para escritura (crear/actualizar)
-    region_fk_id = serializers.PrimaryKeyRelatedField(
+    region_id = serializers.PrimaryKeyRelatedField(
         queryset=Region.objects.all(), 
-        source='region_fk', 
-        allow_null=True, 
-        required=False,
+        source='region', 
         write_only=True
     )
-    province_fk_id = serializers.PrimaryKeyRelatedField(
+    province_id = serializers.PrimaryKeyRelatedField(
         queryset=Province.objects.all(), 
-        source='province_fk', 
-        allow_null=True, 
-        required=False,
+        source='province', 
         write_only=True
     )
-    district_fk_id = serializers.PrimaryKeyRelatedField(
+    district_id = serializers.PrimaryKeyRelatedField(
         queryset=District.objects.all(), 
-        source='district_fk', 
-        allow_null=True, 
-        required=False,
+        source='district', 
         write_only=True
     )
     document_type_id = serializers.PrimaryKeyRelatedField(
@@ -47,26 +41,43 @@ class TherapistSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Therapist
-        fields = "__all__"
-        extra_kwargs = {
-            'email': {
-                'required': False,
-                'allow_null': True,
-                'error_messages': {
-                    'invalid': "El correo debe ser válido y terminar en @gmail.com"
-                }
-            }
-        }
+        fields = [
+            'id',
+            'document_type',
+            'document_number',
+            'last_name_paternal',
+            'last_name_maternal',
+            'first_name',
+            'birth_date',
+            'gender',
+            'personal_reference',
+            'is_active',
+            'phone',
+            'email',
+            'region',
+            'province',
+            'district',
+            'address',
+            'profile_picture',
+            'created_at',
+            'updated_at',
+            'deleted_at',
+            'region_id',
+            'province_id',
+            'district_id',
+            'document_type_id',
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at', 'deleted_at']
         
     def validate(self, attrs):
         """
         Asegura coherencia jerárquica:
-        province_fk debe pertenecer a region_fk
-        district_fk debe pertenecer a province_fk
+        province debe pertenecer a region
+        district debe pertenecer a province
         """
-        region = attrs.get("region_fk") or getattr(self.instance, "region_fk", None)
-        province = attrs.get("province_fk") or getattr(self.instance, "province_fk", None)
-        district = attrs.get("district_fk") or getattr(self.instance, "district_fk", None)
+        region = attrs.get("region") or getattr(self.instance, "region", None)
+        province = attrs.get("province") or getattr(self.instance, "province", None)
+        district = attrs.get("district") or getattr(self.instance, "district", None)
 
         if province and region and province.region_id != region.id:
             raise serializers.ValidationError(
@@ -162,11 +173,11 @@ class TherapistSerializer(serializers.ModelSerializer):
         return value
 
     def validate_phone(self, value):
-        if not value.isdigit():
+        if value and not value.isdigit():
             raise serializers.ValidationError("El teléfono debe contener solo dígitos.")
-        if len(value) > 15:
+        if value and len(value) > 20:
             raise serializers.ValidationError(
-                "El teléfono debe tener máximo 15 dígitos."
+                "El teléfono debe tener máximo 20 dígitos."
             )
         return value
 
@@ -178,26 +189,26 @@ class TherapistSerializer(serializers.ModelSerializer):
         return value
 
     def validate_birth_date(self, value):
-        today = date.today()
+        if value:
+            today = date.today()
 
-        # No permitir fechas futuras
-        if value > today:
-            raise serializers.ValidationError("La fecha de nacimiento no puede ser futura.")
+            # No permitir fechas futuras
+            if value.date() > today:
+                raise serializers.ValidationError("La fecha de nacimiento no puede ser futura.")
 
-        # Calcular edad
-        age = today.year - value.year - ((today.month, today.day) < (value.month, value.day))
-        if age < 18:
-            raise serializers.ValidationError("El terapeuta debe tener al menos 18 años.")
+            # Calcular edad
+            age = today.year - value.year - ((today.month, today.day) < (value.month, value.day))
+            if age < 18:
+                raise serializers.ValidationError("El terapeuta debe tener al menos 18 años.")
 
         return value
 
     def validate_profile_picture(self, value):
         if not value:
             return value
-        valid_extensions = ["png", "jpg", "jpeg"]
-        ext = str(value).split(".")[-1].lower()
-        if ext not in valid_extensions:
+        # Validar que sea una cadena válida (URL o path)
+        if not isinstance(value, str):
             raise serializers.ValidationError(
-                "La imagen debe estar en formato PNG, JPG o JPEG."
+                "La imagen debe ser una URL válida."
             )
         return value

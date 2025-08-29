@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from ..serializers.permission import PermissionSerializer, RoleSerializer
-from ..models import Permission, Role
+from ..models.permission import Permission, Role
 
 
 class PermissionView(APIView):

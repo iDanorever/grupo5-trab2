@@ -126,7 +126,6 @@ class CompanyBusinessService:
 class CompanyService:
     """
     Servicio principal que coordina las operaciones de empresa.
-    Delega responsabilidades específicas a servicios especializados.
     """
     
     @staticmethod
@@ -135,8 +134,8 @@ class CompanyService:
         return CompanyBusinessService.get_company(company_id)
     
     @staticmethod
-    def store(data, file=None):
-        """Crea o actualiza datos de la empresa y procesa el logo si se envía."""
+    def store(data):
+        """Crea o actualiza datos de la empresa."""
         company_id = data.get('id')
         
         try:
@@ -153,17 +152,8 @@ class CompanyService:
             company.company_name = company_name
             
             # Procesar logo si se envía
-            if file:
-                # Validar archivo
-                LogoValidationService.validate(file)
-                
-                # Limpiar logo anterior si existe
-                if company.pk and company.company_logo:
-                    LogoFileManager.delete_logo_file(company.company_logo.name)
-                
-                # Guardar nuevo logo
-                saved_path = LogoFileManager.save_logo_file(company_name, file)
-                company.company_logo = saved_path
+            if 'company_logo' in data:
+                company.company_logo = data['company_logo']
             
             # Guardar empresa
             company.save()
@@ -173,21 +163,11 @@ class CompanyService:
             raise ValueError(f"Error interno al guardar los datos: {str(e)}")
     
     @staticmethod
-    def process_logo(company, file):
-        """Valida y guarda el logo de una empresa existente."""
+    def process_logo(company, logo_url):
+        """Actualiza el logo de una empresa existente."""
         try:
-            # Validar archivo
-            LogoValidationService.validate(file)
-            
-            # Limpiar logo anterior
-            if company.company_logo:
-                LogoFileManager.delete_logo_file(company.company_logo.name)
-            
-            # Guardar nuevo logo
-            saved_path = LogoFileManager.save_logo_file(company.company_name, file)
-            company.company_logo = saved_path
+            company.company_logo = logo_url
             company.save()
-            
             return company
             
         except Exception as e:
@@ -196,12 +176,5 @@ class CompanyService:
     @staticmethod
     def clear_company_logo(company):
         """Elimina el logo de una empresa específica."""
-        if company.company_logo:
-            LogoFileManager.delete_logo_file(company.company_logo.name)
-            company.company_logo = None
-            company.save()
-    
-    @staticmethod
-    def clear_company_folder():
-        """Elimina todos los logos de la carpeta company/."""
-        LogoFileManager.clear_all_logos()
+        company.company_logo = None
+        company.save()

@@ -7,7 +7,7 @@ from ..serializers.password import (
     PasswordChangeSerializer, PasswordResetSerializer,
     PasswordResetConfirmSerializer, PasswordStrengthSerializer
 )
-from ..models import UserVerificationCode
+from ..models.user_verification_code import UserVerificationCode
 
 User = get_user_model()
 

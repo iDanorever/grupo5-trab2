@@ -1,25 +1,36 @@
 from django.db import models
 from django.utils import timezone
-from .document_type import DocumentType
 
 class ActiveHistoryManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(deleted_at__isnull=True)
 
 class History(models.Model):
-    document_type = models.ForeignKey(DocumentType, on_delete=models.PROTECT, related_name="histories")
-    document_number = models.CharField(max_length=50)
+    """
+    Modelo para gestionar los historiales médicos.
+    Basado en la estructura de la tabla histories de la BD.
+    """
+    
+    # Relación con paciente
+    patient = models.ForeignKey('patients_diagnoses.Patient', on_delete=models.CASCADE, verbose_name="Paciente")
+    
+    # Información médica
+    testimony = models.BooleanField(default=True, verbose_name="Testimonio")
+    private_observation = models.TextField(blank=True, null=True, verbose_name="Observación privada")
+    observation = models.TextField(blank=True, null=True, verbose_name="Observación")
+    height = models.DecimalField(max_digits=7, decimal_places=3, blank=True, null=True, verbose_name="Altura")
+    weight = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True, verbose_name="Peso")
+    last_weight = models.DecimalField(max_digits=6, decimal_places=3, blank=True, null=True, verbose_name="Último peso")
+    
+    # Información específica
+    menstruation = models.BooleanField(default=True, verbose_name="Menstruación")
+    diu_type = models.CharField(max_length=255, blank=True, null=True, verbose_name="Tipo de DIU")
+    gestation = models.BooleanField(default=True, verbose_name="Gestación")
 
-    testimony = models.TextField(blank=True, null=True)
-    private_observation = models.TextField(blank=True, null=True)
-    observation = models.TextField(blank=True, null=True)
-    height = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    weight = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    last_weight = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    deleted_at = models.DateTimeField(blank=True, null=True)
+    # Campos de auditoría
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Fecha de actualización")
+    deleted_at = models.DateTimeField(blank=True, null=True, verbose_name="Fecha de eliminación")
 
     objects = models.Manager()
     active = ActiveHistoryManager()
@@ -33,14 +44,10 @@ class History(models.Model):
         self.save(update_fields=["deleted_at"])
 
     def __str__(self):
-        return f"History for {self.document_type_id}-{self.document_number}"
+        return f"Historial de {self.patient}"
 
     class Meta:
         db_table = "histories"
-        constraints = [
-            models.UniqueConstraint(
-                fields=['document_type', 'document_number'],
-                condition=models.Q(deleted_at__isnull=True),
-                name='unique_active_history_by_document'
-            )
-        ]
+        verbose_name = "Historial"
+        verbose_name_plural = "Historiales"
+        ordering = ['-created_at']

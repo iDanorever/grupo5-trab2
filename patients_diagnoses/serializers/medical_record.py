@@ -8,7 +8,7 @@ class MedicalRecordSerializer(serializers.ModelSerializer):
     
     # Campos relacionados anidados
     patient = PatientSerializer(read_only=True)
-    diagnosis = DiagnosisSerializer(read_only=True)
+    diagnose = DiagnosisSerializer(read_only=True)
     
     # IDs para escritura
     patient_id = serializers.PrimaryKeyRelatedField(
@@ -16,20 +16,20 @@ class MedicalRecordSerializer(serializers.ModelSerializer):
         source='patient', 
         write_only=True
     )
-    diagnosis_id = serializers.PrimaryKeyRelatedField(
+    diagnose_id = serializers.PrimaryKeyRelatedField(
         queryset=DiagnosisSerializer.Meta.model.objects.all(), 
-        source='diagnosis', 
+        source='diagnose', 
         write_only=True
     )
     
     class Meta:
         model = MedicalRecord
         fields = [
-            'id', 'patient', 'diagnosis', 'diagnosis_date',
+            'id', 'patient', 'diagnose', 'diagnosis_date',
             'symptoms', 'treatment', 'notes', 'status',
-            'patient_id', 'diagnosis_id', 'created_at', 'updated_at'
+            'patient_id', 'diagnose_id', 'created_at', 'updated_at', 'deleted_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'deleted_at']
     
     def validate_diagnosis_date(self, value):
         """Validar que la fecha de diagnóstico no sea futura."""
@@ -43,7 +43,7 @@ class MedicalRecordSerializer(serializers.ModelSerializer):
         # Validar que no exista un registro duplicado para la misma fecha
         if MedicalRecord.objects.filter(
             patient=data['patient'],
-            diagnosis=data['diagnosis'],
+            diagnose=data['diagnose'],
             diagnosis_date=data['diagnosis_date']
         ).exclude(id=self.instance.id if self.instance else None).exists():
             raise serializers.ValidationError(
@@ -55,12 +55,12 @@ class MedicalRecordListSerializer(serializers.ModelSerializer):
     """Serializer simplificado para listar historiales médicos."""
     
     patient_name = serializers.CharField(source='patient.get_full_name', read_only=True)
-    diagnosis_name = serializers.CharField(source='diagnosis.name', read_only=True)
-    diagnosis_code = serializers.CharField(source='diagnosis.code', read_only=True)
+    diagnose_name = serializers.CharField(source='diagnose.name', read_only=True)
+    diagnose_code = serializers.CharField(source='diagnose.code', read_only=True)
     
     class Meta:
         model = MedicalRecord
         fields = [
-            'id', 'patient_name', 'diagnosis_name', 'diagnosis_code',
+            'id', 'patient_name', 'diagnose_name', 'diagnose_code',
             'diagnosis_date', 'status', 'created_at'
         ]

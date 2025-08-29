@@ -1,10 +1,8 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import (
-    RegionViewSet,
-    ProvinceViewSet,
-    DistrictViewSet
-)
+from .views.region import RegionViewSet
+from .views.province import ProvinceViewSet
+from .views.district import DistrictViewSet
 
 router = DefaultRouter()
 router.register(r"regions", RegionViewSet, basename="region")

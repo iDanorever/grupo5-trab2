@@ -1,44 +1,24 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Permission, Role
+from django.contrib.auth import get_user_model
+from .models.permission import Permission, Role
 
+User = get_user_model()
 
-@admin.register(User)
-class CustomUserAdmin(UserAdmin):
-    list_display = ('email', 'username', 'rol', 'is_active', 'created_at')
-    list_filter = ('rol', 'is_active', 'created_at')
-    search_fields = ('email', 'username')
-    ordering = ('-created_at',)
-    
-    fieldsets = (
-        (None, {'fields': ('email', 'password')}),
-        ('Personal info', {'fields': ('username', 'phone', 'rol')}),
-        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
-        ('Important dates', {'fields': ('last_login', 'created_at', 'updated_at')}),
-    )
-    
-    add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('email', 'username', 'password1', 'password2', 'rol'),
-        }),
-    )
-    
-    readonly_fields = ('created_at', 'updated_at')
 
 @admin.register(Permission)
 class PermissionAdmin(admin.ModelAdmin):
-    list_display = ('name', 'codename', 'content_type', 'detail', 'is_active')
-    list_filter = ('content_type', 'is_active')
-    search_fields = ('name', 'codename')
-    ordering = ('content_type', 'codename')
+    list_display = ('name', 'detail', 'guard_name', 'created_at')
+    list_filter = ('guard_name', 'created_at')
+    search_fields = ('name', 'detail')
+    ordering = ('name',)
     readonly_fields = ('created_at', 'updated_at')
 
 
 @admin.register(Role)
 class RoleAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description', 'is_active', 'created_at')
-    list_filter = ('name', 'is_active', 'created_at')
-    search_fields = ('name', 'description')
+    list_display = ('name', 'guard_name', 'created_at')
+    list_filter = ('guard_name', 'created_at')
+    search_fields = ('name',)
     ordering = ('name',)
     readonly_fields = ('created_at', 'updated_at') 

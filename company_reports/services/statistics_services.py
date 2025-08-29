@@ -38,7 +38,7 @@ class StatisticsService:
                     Value(' '),
                     'therapist__last_name_maternal', 
                     Value(', '),
-                    'therapist__first_name'
+                    'therapist__name'
                 ),
                 sesiones=Count("id"),
                 ingresos=Sum("payment")
@@ -142,8 +142,8 @@ class StatisticsService:
         return Appointment.objects.filter(
             appointment_date__range=[start, end]
         ).aggregate(
-            c=Count("id", filter=Q(appointment_type__iexact="C")),
-            cc=Count("id", filter=Q(appointment_type__iexact="CC"))
+            c=Count("id", filter=Q(appointment_status__iexact="C")),
+            cc=Count("id", filter=Q(appointment_status__iexact="CC"))
         )
 
     def get_statistics(self, start, end):

@@ -8,69 +8,31 @@ from django.shortcuts import render
 from rest_framework.views import APIView
 
 from company_reports.models.company import CompanyData
-from company_reports.serialiazers.company_serializers import CompanyDataSerializer, UploadImageRequest
-from company_reports.services.companay_services import CompanyService, LogoValidationService
-
-
-class LogoFileView(APIView):
-    """Responsable exclusivamente del manejo de archivos de logos."""
-    
-    def get_logo_file_response(self, company):
-        """Genera la respuesta del archivo de logo."""
-        if not company.company_logo:
-            raise Http404("La empresa no tiene logo")
-        
-        # Usar el storage de Django en lugar de os.path
-        try:
-            return FileResponse(company.company_logo.open('rb'))
-        except Exception:
-            raise Http404("Archivo de logo no encontrado")
-    
-    def delete_logo_file(self, company):
-        """Elimina el archivo de logo de una empresa."""
-        CompanyService.clear_company_logo(company)
-        return {"message": "Logo eliminado correctamente"}
-
-
-class CompanyBusinessView(APIView):
-    """Responsable exclusivamente de la lógica de negocio de empresas."""
-    
-    def preserve_logo_on_update(self, instance, current_logo):
-        """Preserva el logo existente si no se envía uno nuevo."""
-        if current_logo and not instance.company_logo:
-            instance.company_logo = current_logo
-            instance.save()
-    
-    def handle_logo_update(self, instance, request):
-        """Maneja la actualización de logos en el update."""
-        if 'logo' in request.FILES or 'company_logo' in request.FILES:
-            return True  # Indicar que se debe usar el store method
-        return False
+from company_reports.serialiazers.company_serializers import CompanyDataSerializer
+from company_reports.services.companay_services import CompanyService
 
 
 class CompanyDataViewSet(viewsets.ModelViewSet):
-    """API REST pura para empresas. Delega responsabilidades específicas."""
+    """API REST pura para empresas."""
     
     queryset = CompanyData.objects.all()
     serializer_class = CompanyDataSerializer
     parser_classes = [MultiPartParser, FormParser, JSONParser]
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.logo_view = LogoFileView()
-        self.business_view = CompanyBusinessView()
-
-    @action(detail=True, methods=['post', 'put'], parser_classes=[MultiPartParser, FormParser])
+    @action(detail=True, methods=['post', 'put'])
     def upload_logo(self, request, pk=None):
         """
         POST: Sube un logo solo si la empresa no tiene uno
         PUT: Actualiza el logo existente
         """
         company = self.get_object()
-        serializer = UploadImageRequest(data=request.data)
+        logo_url = request.data.get('company_logo')
         
-        if not serializer.is_valid():
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if not logo_url:
+            return Response(
+                {"error": "Se requiere la URL del logo"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         # Si es POST y ya tiene logo, no permitir la subida
         if request.method == 'POST' and company.company_logo:
@@ -80,37 +42,26 @@ class CompanyDataViewSet(viewsets.ModelViewSet):
             )
             
         try:
-            CompanyService.process_logo(company, serializer.validated_data['logo'])
+            CompanyService.process_logo(company, logo_url)
             message = "Logo actualizado correctamente" if request.method == 'PUT' else "Logo subido correctamente"
             return Response({"message": message}, status=status.HTTP_200_OK)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['get'])
-    def show_logo(self, request, pk=None):
-        """Muestra el logo de la empresa."""
-        try:
-            company = self.get_object()
-        except Http404:
-            raise Http404("Empresa no encontrada")
-
-        return self.logo_view.get_logo_file_response(company)
-
     @action(detail=True, methods=['delete'])
     def delete_logo(self, request, pk=None):
         """Elimina el logo de la empresa."""
         company = self.get_object()
-        result = self.logo_view.delete_logo_file(company)
-        return Response(result, status=status.HTTP_200_OK)
+        CompanyService.clear_company_logo(company)
+        return Response({"message": "Logo eliminado correctamente"}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'], parser_classes=[MultiPartParser, FormParser, JSONParser])
     def store(self, request):
-        """Crea o actualiza datos de la empresa y procesa el logo si se envía."""
+        """Crea o actualiza datos de la empresa."""
         data = request.data
-        file = request.FILES.get('logo') or request.FILES.get('company_logo')
     
         try:
-            company = CompanyService.store(data, file)
+            company = CompanyService.store(data)
         except ValueError as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
     
@@ -145,15 +96,14 @@ class CompanyDataViewSet(viewsets.ModelViewSet):
         })
     
     def update(self, request, *args, **kwargs):
-        """Actualiza los datos de la empresa, incluyendo el logo si se proporciona"""
+        """Actualiza los datos de la empresa"""
         instance = self.get_object()
         data = request.data.copy()  # Hacer una copia para poder modificar
         data['id'] = kwargs.get('pk')  # Añadir el ID para que store sepa que es una actualización
-        file = request.FILES.get('logo') or request.FILES.get('company_logo')
 
         try:
             # Usar CompanyService para manejar la actualización
-            company = CompanyService.store(data, file)
+            company = CompanyService.store(data)
             serializer = self.get_serializer(company)
             return Response(serializer.data)
         except ValueError as e:

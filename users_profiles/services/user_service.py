@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import transaction
-from ..models import UserProfile
 
 User = get_user_model()
 
@@ -16,21 +15,12 @@ class UserService:
             with transaction.atomic():
                 # Crear el usuario
                 user = User.objects.create_user(
-                    username=user_data['username'],
+                    user_name=user_data['user_name'],
                     email=user_data['email'],
                     password=user_data['password'],
-                    first_name=user_data.get('first_name', ''),
-                    last_name=user_data.get('last_name', '')
-                )
-                
-                # Crear perfil básico
-                UserProfile.objects.create(
-                    user=user,
-                    first_name=user_data.get('first_name', ''),
-                    paternal_lastname=user_data.get('last_name', ''),
-                    maternal_lastname='',
-                    email=user_data['email'],
-                    gender='P'
+                    name=user_data.get('name', ''),
+                    paternal_lastname=user_data.get('paternal_lastname', ''),
+                    maternal_lastname=user_data.get('maternal_lastname', '')
                 )
                 
                 return user
@@ -55,15 +45,11 @@ class UserService:
             raise ValidationError(f"Error al actualizar usuario: {str(e)}")
     
     @staticmethod
-    def update_profile_photo(user, photo_file):
+    def update_profile_photo(user, photo_url):
         """Actualiza la foto de perfil del usuario"""
         try:
-            # Eliminar foto anterior si existe
-            if user.profile_photo:
-                user.profile_photo.delete(save=False)
-            
             # Asignar nueva foto
-            user.profile_photo = photo_file
+            user.photo_url = photo_url
             user.save()
             
             return user
@@ -75,11 +61,9 @@ class UserService:
     def delete_profile_photo(user):
         """Elimina la foto de perfil del usuario"""
         try:
-            if user.profile_photo:
-                user.profile_photo.delete(save=False)
-                user.save()
-                return True
-            return False
+            user.photo_url = None
+            user.save()
+            return True
             
         except Exception as e:
             raise ValidationError(f"Error al eliminar foto de perfil: {str(e)}")
@@ -94,9 +78,9 @@ class UserService:
             
             if query:
                 queryset = queryset.filter(
-                    Q(username__icontains=query) |
-                    Q(first_name__icontains=query) |
-                    Q(last_name__icontains=query)
+                    Q(user_name__icontains=query) |
+                    Q(name__icontains=query) |
+                    Q(paternal_lastname__icontains=query)
                 )
             
             return queryset[:limit]
@@ -105,10 +89,10 @@ class UserService:
             raise ValidationError(f"Error en búsqueda de usuarios: {str(e)}")
     
     @staticmethod
-    def get_user_by_username(username):
+    def get_user_by_username(user_name):
         """Obtiene un usuario por username"""
         try:
-            return User.objects.get(username=username, is_active=True)
+            return User.objects.get(user_name=user_name, is_active=True)
         except User.DoesNotExist:
             return None
     
@@ -145,22 +129,19 @@ class UserService:
         """Obtiene estadísticas del usuario"""
         try:
             stats = {
-                'username': user.username,
+                'user_name': user.user_name,
                 'email': user.email,
                 'is_active': user.is_active,
-                'email_verified': user.email_verified,
                 'date_joined': user.date_joined,
                 'last_login': user.last_login,
-                'has_profile_photo': bool(user.profile_photo),
+                'has_profile_photo': bool(user.photo_url),
                 'profile_completion': 0
             }
             
-            # Calcular completitud del perfil si existe
-            try:
-                profile = user.profile
-                stats['profile_completion'] = profile.get_completion_percentage()
-            except UserProfile.DoesNotExist:
-                pass
+            # Calcular completitud del perfil
+            required_fields = ['name', 'email', 'phone']
+            completed_fields = sum(1 for field in required_fields if getattr(user, field))
+            stats['profile_completion'] = (completed_fields / len(required_fields)) * 100
             
             return stats
             

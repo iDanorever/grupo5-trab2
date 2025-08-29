@@ -2,6 +2,9 @@ from django.db import transaction
 from rest_framework import status
 from rest_framework.response import Response
 from ..models import Ticket
+from ..serializers import TicketSerializer
+from django.utils import timezone
+import uuid
 
 
 class TicketService:
@@ -10,6 +13,7 @@ class TicketService:
     Basado en la estructura del módulo Laravel 05_appointments_status.
     """
     
+    @transaction.atomic
     def create(self, data):
         """
         Crea un nuevo ticket.
@@ -20,7 +24,34 @@ class TicketService:
         Returns:
             Response: Respuesta con el ticket creado o error
         """
-        pass
+        try:
+            # Validar datos requeridos
+            required_fields = ['appointment', 'amount', 'payment_method']
+            for field in required_fields:
+                if field not in data:
+                    return Response(
+                        {'error': f'El campo {field} es requerido'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+            
+            # Generar número de ticket único si no se proporciona
+            if 'ticket_number' not in data:
+                data['ticket_number'] = self.generate_ticket_number()
+            
+            # Crear el ticket
+            ticket = Ticket.objects.create(**data)
+            serializer = TicketSerializer(ticket)
+            
+            return Response({
+                'message': 'Ticket creado exitosamente',
+                'ticket': serializer.data
+            }, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            return Response(
+                {'error': f'Error al crear el ticket: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
     def get_by_id(self, ticket_id):
         """
@@ -32,8 +63,22 @@ class TicketService:
         Returns:
             Response: Respuesta con el ticket o error si no existe
         """
-        pass
+        try:
+            ticket = Ticket.objects.get(id=ticket_id, is_active=True)
+            serializer = TicketSerializer(ticket)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Ticket.DoesNotExist:
+            return Response(
+                {'error': 'Ticket no encontrado'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {'error': f'Error al obtener el ticket: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
+    @transaction.atomic
     def update(self, ticket_id, data):
         """
         Actualiza un ticket existente.
@@ -45,7 +90,32 @@ class TicketService:
         Returns:
             Response: Respuesta con el ticket actualizado o error
         """
-        pass
+        try:
+            ticket = Ticket.objects.get(id=ticket_id, is_active=True)
+            
+            # Actualizar campos
+            for field, value in data.items():
+                if hasattr(ticket, field):
+                    setattr(ticket, field, value)
+            
+            ticket.save()
+            serializer = TicketSerializer(ticket)
+            
+            return Response({
+                'message': 'Ticket actualizado exitosamente',
+                'ticket': serializer.data
+            }, status=status.HTTP_200_OK)
+            
+        except Ticket.DoesNotExist:
+            return Response(
+                {'error': 'Ticket no encontrado'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {'error': f'Error al actualizar el ticket: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
     def delete(self, ticket_id):
         """
@@ -57,7 +127,24 @@ class TicketService:
         Returns:
             Response: Respuesta de confirmación o error
         """
-        pass
+        try:
+            ticket = Ticket.objects.get(id=ticket_id, is_active=True)
+            ticket.soft_delete()
+            
+            return Response({
+                'message': 'Ticket eliminado exitosamente'
+            }, status=status.HTTP_200_OK)
+            
+        except Ticket.DoesNotExist:
+            return Response(
+                {'error': 'Ticket no encontrado'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {'error': f'Error al eliminar el ticket: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
     def list_all(self, filters=None, pagination=None):
         """
@@ -70,7 +157,39 @@ class TicketService:
         Returns:
             Response: Respuesta con la lista de tickets
         """
-        pass
+        try:
+            queryset = Ticket.objects.filter(is_active=True)
+            
+            # Aplicar filtros
+            if filters:
+                if 'status' in filters:
+                    queryset = queryset.filter(status=filters['status'])
+                if 'payment_method' in filters:
+                    queryset = queryset.filter(payment_method=filters['payment_method'])
+                if 'appointment' in filters:
+                    queryset = queryset.filter(appointment=filters['appointment'])
+                if 'payment_date' in filters:
+                    queryset = queryset.filter(payment_date__date=filters['payment_date'])
+            
+            # Aplicar paginación básica
+            if pagination:
+                page = pagination.get('page', 1)
+                page_size = pagination.get('page_size', 10)
+                start = (page - 1) * page_size
+                end = start + page_size
+                queryset = queryset[start:end]
+            
+            serializer = TicketSerializer(queryset, many=True)
+            return Response({
+                'count': queryset.count(),
+                'results': serializer.data
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response(
+                {'error': f'Error al listar los tickets: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
     def get_by_ticket_number(self, ticket_number):
         """
@@ -82,7 +201,20 @@ class TicketService:
         Returns:
             Response: Respuesta con el ticket o error si no existe
         """
-        pass
+        try:
+            ticket = Ticket.objects.get(ticket_number=ticket_number, is_active=True)
+            serializer = TicketSerializer(ticket)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Ticket.DoesNotExist:
+            return Response(
+                {'error': 'Ticket no encontrado'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {'error': f'Error al obtener el ticket: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
     def get_paid_tickets(self, filters=None):
         """
@@ -94,7 +226,29 @@ class TicketService:
         Returns:
             Response: Respuesta con los tickets pagados
         """
-        pass
+        try:
+            queryset = Ticket.objects.filter(status='paid', is_active=True)
+            
+            # Aplicar filtros adicionales
+            if filters:
+                if 'payment_method' in filters:
+                    queryset = queryset.filter(payment_method=filters['payment_method'])
+                if 'appointment' in filters:
+                    queryset = queryset.filter(appointment=filters['appointment'])
+                if 'payment_date' in filters:
+                    queryset = queryset.filter(payment_date__date=filters['payment_date'])
+            
+            serializer = TicketSerializer(queryset, many=True)
+            return Response({
+                'count': queryset.count(),
+                'results': serializer.data
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response(
+                {'error': f'Error al obtener tickets pagados: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
     def get_pending_tickets(self, filters=None):
         """
@@ -106,8 +260,31 @@ class TicketService:
         Returns:
             Response: Respuesta con los tickets pendientes
         """
-        pass
+        try:
+            queryset = Ticket.objects.filter(status='pending', is_active=True)
+            
+            # Aplicar filtros adicionales
+            if filters:
+                if 'payment_method' in filters:
+                    queryset = queryset.filter(payment_method=filters['payment_method'])
+                if 'appointment' in filters:
+                    queryset = queryset.filter(appointment=filters['appointment'])
+                if 'payment_date' in filters:
+                    queryset = queryset.filter(payment_date__date=filters['payment_date'])
+            
+            serializer = TicketSerializer(queryset, many=True)
+            return Response({
+                'count': queryset.count(),
+                'results': serializer.data
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response(
+                {'error': f'Error al obtener tickets pendientes: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
+    @transaction.atomic
     def mark_as_paid(self, ticket_id):
         """
         Marca un ticket como pagado.
@@ -118,8 +295,28 @@ class TicketService:
         Returns:
             Response: Respuesta de confirmación o error
         """
-        pass
+        try:
+            ticket = Ticket.objects.get(id=ticket_id, is_active=True)
+            ticket.mark_as_paid()
+            serializer = TicketSerializer(ticket)
+            
+            return Response({
+                'message': 'Ticket marcado como pagado exitosamente',
+                'ticket': serializer.data
+            }, status=status.HTTP_200_OK)
+            
+        except Ticket.DoesNotExist:
+            return Response(
+                {'error': 'Ticket no encontrado'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {'error': f'Error al marcar ticket como pagado: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
+    @transaction.atomic
     def mark_as_cancelled(self, ticket_id):
         """
         Marca un ticket como cancelado.
@@ -130,7 +327,26 @@ class TicketService:
         Returns:
             Response: Respuesta de confirmación o error
         """
-        pass
+        try:
+            ticket = Ticket.objects.get(id=ticket_id, is_active=True)
+            ticket.mark_as_cancelled()
+            serializer = TicketSerializer(ticket)
+            
+            return Response({
+                'message': 'Ticket marcado como cancelado exitosamente',
+                'ticket': serializer.data
+            }, status=status.HTTP_200_OK)
+            
+        except Ticket.DoesNotExist:
+            return Response(
+                {'error': 'Ticket no encontrado'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {'error': f'Error al marcar ticket como cancelado: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
     def generate_ticket_number(self):
         """
@@ -142,4 +358,6 @@ class TicketService:
         Returns:
             str: Número de ticket único
         """
-        pass
+        timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
+        unique_id = str(uuid.uuid4())[:8].upper()
+        return f'TICKET-{timestamp}-{unique_id}'

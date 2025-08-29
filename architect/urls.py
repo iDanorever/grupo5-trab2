@@ -1,8 +1,7 @@
 from django.urls import path
-from .views import (
-    LoginView, RegisterView, UserView,
-    PermissionView, RoleView
-)
+from .views.auth import LoginView, RegisterView
+from .views.user import UserView
+from .views.permission import PermissionView, RoleView
 
 app_name = 'architect'
 

@@ -1,5 +1,5 @@
 from .permission import Permission, Role
 from .base import BaseModel
-from .user import User
+from .role_has_permission import RoleHasPermission
 
-__all__ = ['User', 'Permission', 'Role', 'BaseModel'] 
+__all__ = ['Permission', 'Role', 'BaseModel', 'RoleHasPermission'] 

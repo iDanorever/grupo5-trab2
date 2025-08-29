@@ -3,46 +3,42 @@ from ubi_geo.models import Region, Province, District
 from histories_configurations.models import DocumentType
 
 class Therapist(models.Model):
-    GENDERS = [
-        ('M', 'Masculino'),
-        ('F', 'Femenino'),
-        ('O', 'Otro'),
-    ]
-
-    STATUS = [
-        (True, 'Activo'),
-        (False, 'Inactivo'),
-    ]
-
-    # Datos personales - Reemplazar por ForeignKey
+    """
+    Modelo para gestionar los terapeutas.
+    Basado en la estructura de la tabla therapists de la BD.
+    """
+    
+    # Datos personales
     document_type = models.ForeignKey(
         DocumentType, 
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         verbose_name="Tipo de documento"
     )
-    document_number = models.CharField(max_length=20, unique=True)
-    last_name_paternal = models.CharField(max_length=100)
-    last_name_maternal = models.CharField(max_length=100, blank=True, null=True)
-    first_name = models.CharField(max_length=100)
-    birth_date = models.DateField()
-    gender = models.CharField(max_length=1, choices=GENDERS)
-    personal_reference = models.CharField(max_length=255, blank=True, null=True)
-    is_active = models.BooleanField(choices=STATUS, default=True)
+    document_number = models.CharField(max_length=20, unique=True, verbose_name="Número de documento")
+    last_name_paternal = models.CharField(max_length=150, verbose_name="Apellido paterno")
+    last_name_maternal = models.CharField(max_length=150, verbose_name="Apellido materno")
+    first_name = models.CharField(max_length=150, verbose_name="Nombre")
+    birth_date = models.DateTimeField(blank=True, null=True, verbose_name="Fecha de nacimiento")
+    gender = models.CharField(max_length=50, blank=True, null=True, verbose_name="Sexo")
+    personal_reference = models.CharField(max_length=255, blank=True, null=True, verbose_name="Referencia personal")
+    is_active = models.BooleanField(default=True, verbose_name="Activo")
 
     # Información de contacto
-    phone = models.CharField(max_length=15)
-    email = models.EmailField(blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Teléfono")
+    email = models.CharField(max_length=254, verbose_name="Email")
 
-    # Ubicación con FK
-    region_fk = models.ForeignKey(Region, on_delete=models.PROTECT, null=True, blank=True, related_name="+")
-    province_fk = models.ForeignKey(Province, on_delete=models.PROTECT, null=True, blank=True, related_name="+")
-    district_fk = models.ForeignKey(District, on_delete=models.PROTECT, null=True, blank=True, related_name="+")
+    # Ubicación
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, verbose_name="Región")
+    province = models.ForeignKey(Province, on_delete=models.CASCADE, verbose_name="Provincia")
+    district = models.ForeignKey(District, on_delete=models.CASCADE, verbose_name="Distrito")
 
-    address = models.TextField(blank=True, null=True)
-    profile_picture = models.ImageField(
-        upload_to="profile_pictures/",
-        blank=True, null=True
-    )
+    address = models.TextField(blank=True, null=True, verbose_name="Dirección")
+    profile_picture = models.CharField(max_length=255, blank=True, null=True, verbose_name="Foto de perfil")
+    
+    # Campos de auditoría
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Fecha de actualización")
+    deleted_at = models.DateTimeField(blank=True, null=True, verbose_name="Fecha de eliminación")
 
     def get_full_name(self):
         """Obtiene el nombre completo del terapeuta."""
@@ -52,6 +48,7 @@ class Therapist(models.Model):
         return self.get_full_name()
 
     class Meta:
-        # Opcional: puedes agregar metadatos adicionales
+        db_table = 'therapists'
         verbose_name = "Terapeuta"
         verbose_name_plural = "Terapeutas"
+        ordering = ['first_name', 'last_name_paternal']

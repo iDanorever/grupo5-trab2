@@ -21,7 +21,7 @@ class AppointmentStatus(models.Model):
     # Campos de auditoría
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Fecha de creación")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Fecha de actualización")
-    is_active = models.BooleanField(default=True, verbose_name="Activo")
+    deleted_at = models.DateTimeField(blank=True, null=True, verbose_name="Fecha de eliminación")
     
     class Meta:
         db_table = 'appointment_statuses'

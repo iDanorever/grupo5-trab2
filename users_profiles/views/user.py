@@ -63,15 +63,15 @@ class UserProfilePhotoView(APIView):
             serializer.save()
             return Response({
                 'message': 'Foto de perfil actualizada exitosamente',
-                'profile_photo_url': request.user.get_profile_photo_url()
+                'photo_url': request.user.photo_url
             }, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request):
         """Elimina la foto de perfil del usuario"""
-        if request.user.profile_photo:
-            request.user.profile_photo.delete(save=False)
+        if request.user.photo_url:
+            request.user.photo_url = None
             request.user.save()
             return Response({
                 'message': 'Foto de perfil eliminada exitosamente'
@@ -95,9 +95,9 @@ class UserSearchView(generics.ListAPIView):
         
         if search_query:
             queryset = queryset.filter(
-                models.Q(username__icontains=search_query) |
-                models.Q(first_name__icontains=search_query) |
-                models.Q(last_name__icontains=search_query)
+                models.Q(user_name__icontains=search_query) |
+                models.Q(name__icontains=search_query) |
+                models.Q(paternal_lastname__icontains=search_query)
             )
         
         return queryset[:20]  # Limitar a 20 resultados

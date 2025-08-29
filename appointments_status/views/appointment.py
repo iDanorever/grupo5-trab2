@@ -6,6 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from ..models import Appointment
 from ..serializers import AppointmentSerializer
+from ..services import AppointmentService
 from django.utils import timezone
 
 
@@ -15,10 +16,10 @@ from django.utils import timezone
 class AppointmentViewSet(viewsets.ModelViewSet):
     """
     ViewSet para gestionar las citas médicas.
-    Basado en la estructura del módulo Laravel 05_appointments_status.
+    Basado en la estructura actualizada del modelo.
     """
     
-    queryset = Appointment.objects.all()
+    queryset = Appointment.objects.filter(deleted_at__isnull=True)
     serializer_class = AppointmentSerializer
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_fields = [
@@ -26,7 +27,8 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         'appointment_status', 
         'appointment_type', 
         'room',
-        'is_active'
+        'patient',
+        'therapist'
     ]
     search_fields = [
         'ailments', 
@@ -36,50 +38,96 @@ class AppointmentViewSet(viewsets.ModelViewSet):
     ]
     ordering_fields = [
         'appointment_date', 
-        'appointment_hour', 
+        'hour', 
         'created_at', 
         'updated_at'
     ]
-    ordering = ['-appointment_date', '-appointment_hour']
+    ordering = ['-appointment_date', '-hour']
+    
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.service = AppointmentService()
     
     def get_queryset(self):
         """
         Filtra el queryset según los parámetros de la request.
         """
-        queryset = Appointment.objects.all()
+        queryset = Appointment.objects.filter(deleted_at__isnull=True)
         
         # Filtros adicionales
         appointment_date = self.request.query_params.get('appointment_date', None)
         if appointment_date:
             queryset = queryset.filter(appointment_date=appointment_date)
         
-        # TODO: (Dependencia externa) - Agregar filtros cuando estén disponibles:
-        # patient_id = self.request.query_params.get('patient_id', None)
-        # therapist_id = self.request.query_params.get('therapist_id', None)
-        
         return queryset
+    
+    def create(self, request, *args, **kwargs):
+        """
+        Crea una nueva cita con ticket automático.
+        """
+        return self.service.create(request.data)
+    
+    def update(self, request, *args, **kwargs):
+        """
+        Actualiza una cita existente.
+        """
+        appointment_id = kwargs.get('pk')
+        return self.service.update(appointment_id, request.data)
+    
+    def destroy(self, request, *args, **kwargs):
+        """
+        Elimina una cita (soft delete).
+        """
+        appointment_id = kwargs.get('pk')
+        return self.service.delete(appointment_id)
+    
+    def list(self, request, *args, **kwargs):
+        """
+        Lista todas las citas con filtros y paginación.
+        """
+        filters = {}
+        pagination = {}
+        
+        # Extraer filtros de query params
+        for field in ['appointment_date', 'appointment_status', 'patient', 'therapist']:
+            value = request.query_params.get(field)
+            if value:
+                filters[field] = value
+        
+        # Extraer parámetros de paginación
+        page = request.query_params.get('page')
+        page_size = request.query_params.get('page_size')
+        if page or page_size:
+            pagination['page'] = int(page) if page else 1
+            pagination['page_size'] = int(page_size) if page_size else 10
+        
+        return self.service.list_all(filters, pagination)
     
     @action(detail=False, methods=['get'])
     def completed(self, request):
         """
         Obtiene las citas completadas.
         """
-        queryset = self.get_queryset().filter(
-            appointment_date__lt=timezone.now().date()
-        )
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        filters = {}
+        for field in ['appointment_status', 'patient', 'therapist']:
+            value = request.query_params.get(field)
+            if value:
+                filters[field] = value
+        
+        return self.service.get_completed_appointments(filters)
     
     @action(detail=False, methods=['get'])
     def pending(self, request):
         """
         Obtiene las citas pendientes.
         """
-        queryset = self.get_queryset().filter(
-            appointment_date__gte=timezone.now().date()
-        )
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        filters = {}
+        for field in ['appointment_status', 'patient', 'therapist']:
+            value = request.query_params.get(field)
+            if value:
+                filters[field] = value
+        
+        return self.service.get_pending_appointments(filters)
     
     @action(detail=False, methods=['get'])
     def by_date_range(self, request):
@@ -95,11 +143,40 @@ class AppointmentViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        queryset = self.get_queryset().filter(
-            appointment_date__range=[start_date, end_date]
-        )
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        filters = {}
+        for field in ['appointment_status', 'patient', 'therapist']:
+            value = request.query_params.get(field)
+            if value:
+                filters[field] = value
+        
+        return self.service.get_by_date_range(start_date, end_date, filters)
+    
+    @action(detail=False, methods=['get'])
+    def check_availability(self, request):
+        """
+        Verifica la disponibilidad para una cita.
+        """
+        date = request.query_params.get('date')
+        hour = request.query_params.get('hour')
+        duration = request.query_params.get('duration', 60)
+        
+        if not date or not hour:
+            return Response(
+                {'error': 'Se requieren date y hour'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            from datetime import datetime
+            date_obj = datetime.strptime(date, '%Y-%m-%d').date()
+            hour_obj = datetime.strptime(hour, '%H:%M').time()
+        except ValueError:
+            return Response(
+                {'error': 'Formato de fecha u hora inválido. Use YYYY-MM-DD y HH:MM'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        return self.service.check_availability(date_obj, hour_obj, int(duration))
     
     @action(detail=True, methods=['post'])
     def cancel(self, request, pk=None):
@@ -107,8 +184,19 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         Cancela una cita específica.
         """
         appointment = self.get_object()
-        # TODO: Implementar lógica de cancelación
-        return Response({'message': 'Cita cancelada'})
+        appointment.appointment_status = 'CANCELADO'  # Usar el enum actualizado
+        appointment.save(update_fields=['appointment_status', 'updated_at'])
+        
+        # También cancelar el ticket asociado
+        try:
+            from ..models import Ticket
+            ticket = Ticket.objects.get(appointment=appointment)
+            ticket.status = 'cancelled'
+            ticket.save(update_fields=['status', 'updated_at'])
+        except Ticket.DoesNotExist:
+            pass
+        
+        return Response({'message': 'Cita cancelada exitosamente'})
     
     @action(detail=True, methods=['post'])
     def reschedule(self, request, pk=None):
@@ -116,5 +204,36 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         Reprograma una cita específica.
         """
         appointment = self.get_object()
-        # TODO: Implementar lógica de reprogramación
-        return Response({'message': 'Cita reprogramada'})
+        new_date = request.data.get('appointment_date')
+        new_hour = request.data.get('hour')
+        
+        if not new_date or not new_hour:
+            return Response(
+                {'error': 'Se requieren appointment_date y hour'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Verificar disponibilidad
+        try:
+            from datetime import datetime
+            date_obj = datetime.strptime(new_date, '%Y-%m-%d').date()
+            hour_obj = datetime.strptime(new_hour, '%H:%M').time()
+        except ValueError:
+            return Response(
+                {'error': 'Formato de fecha u hora inválido. Use YYYY-MM-DD y HH:MM'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        availability = self.service.check_availability(date_obj, hour_obj)
+        if not availability.data.get('is_available'):
+            return Response(
+                {'error': 'La fecha y hora seleccionadas no están disponibles'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Actualizar la cita
+        appointment.appointment_date = date_obj
+        appointment.hour = hour_obj
+        appointment.save(update_fields=['appointment_date', 'hour', 'updated_at'])
+        
+        return Response({'message': 'Cita reprogramada exitosamente'})

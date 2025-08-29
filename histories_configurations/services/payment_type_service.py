@@ -1,4 +1,4 @@
-from ..models import PaymentType
+from ..models.payment_type import PaymentType
 
 def list_active():
     return PaymentType.objects.filter(deleted_at__isnull=True)

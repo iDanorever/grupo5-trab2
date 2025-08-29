@@ -1,4 +1,4 @@
-from ..models import DocumentType
+from ..models.document_type import DocumentType
 
 def list_active():
     return DocumentType.objects.filter(deleted_at__isnull=True)

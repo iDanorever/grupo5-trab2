@@ -1,6 +1,8 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import AppointmentViewSet, AppointmentStatusViewSet, TicketViewSet
+from .views.appointment import AppointmentViewSet
+from .views.appointment_status import AppointmentStatusViewSet
+from .views.ticket import TicketViewSet
 
 # Configuración del router
 router = DefaultRouter()
