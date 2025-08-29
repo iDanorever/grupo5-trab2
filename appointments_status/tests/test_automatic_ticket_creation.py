@@ -50,7 +50,7 @@ class AutomaticTicketCreationTest(TestCase):
         self.assertEqual(ticket.amount, Decimal('150.00'))
         self.assertEqual(ticket.payment_method, 'efectivo')
         self.assertEqual(ticket.status, 'pending')
-        self.assertTrue(ticket.ticket_number.startswith('TICKET-'))
+        self.assertTrue(ticket.ticket_number.startswith('TKT-'))
         
         # Verificar que el número de ticket se guardó en la cita
         self.assertEqual(appointment.ticket_number, ticket.ticket_number)

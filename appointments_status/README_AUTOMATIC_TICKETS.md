@@ -66,12 +66,12 @@ def ready(self):
 
 ## Estructura del Número de Ticket
 
-Formato: `TICKET-YYYYMMDDHHMMSS-XXXXXXXX`
+Formato: `TKT-XXX` (secuencial)
 
-- **YYYYMMDDHHMMSS**: Timestamp de creación
-- **XXXXXXXX**: 8 caracteres únicos de UUID
+- **TKT**: Prefijo fijo
+- **XXX**: Número secuencial con ceros a la izquierda
 
-Ejemplo: `TICKET-20241225143022-A1B2C3D4`
+Ejemplos: `TKT-001`, `TKT-002`, `TKT-010`, `TKT-100`
 
 ## Datos Automáticos del Ticket
 
@@ -139,10 +139,10 @@ Content-Type: application/json
         "appointment_date": "2024-12-25",
         "appointment_hour": "10:00:00",
         "payment": "150.00",
-        "ticket_number": "TICKET-20241225143022-A1B2C3D4",
+        "ticket_number": "TKT-001",
         ...
     },
-    "ticket_number": "TICKET-20241225143022-A1B2C3D4"
+    "ticket_number": "TKT-001"
 }
 ```
 
@@ -182,3 +182,14 @@ Las pruebas están en `appointments_status/tests/test_automatic_ticket_creation.
 ## Estado del Requerimiento
 
 ✅ **CUMPLIDO**: La funcionalidad de creación automática de tickets al crear citas está completamente implementada y funcional.
+
+### ✅ Cambios Recientes - Formato Secuencial
+
+**Antes:** `TICKET-YYYYMMDDHHMMSS-XXXXXXXX`
+**Ahora:** `TKT-001`, `TKT-002`, `TKT-003`, etc.
+
+- ✅ Formato secuencial implementado
+- ✅ Números con ceros a la izquierda (001, 002, 010, 100)
+- ✅ Compatibilidad con tickets existentes
+- ✅ Pruebas actualizadas
+- ✅ Documentación actualizada

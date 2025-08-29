@@ -19,11 +19,13 @@ def create_tickets_for_existing_appointments(apps, schema_editor):
         id__in=Ticket.objects.values_list('appointment_id', flat=True)
     )
     
+    # Contador para números secuenciales
+    ticket_counter = 1
+    
     for appointment in appointments_without_tickets:
-        # Generar número de ticket único
-        timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
-        unique_id = str(uuid.uuid4())[:8].upper()
-        ticket_number = f'TICKET-{timestamp}-{unique_id}'
+        # Generar número de ticket único en formato secuencial
+        ticket_number = f'TKT-{ticket_counter:03d}'
+        ticket_counter += 1
         
         # Crear el ticket
         Ticket.objects.create(

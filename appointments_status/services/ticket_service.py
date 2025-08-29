@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from ..models import Ticket
 from ..serializers import TicketSerializer
 from django.utils import timezone
-import uuid
+import re
 
 
 class TicketService:
@@ -350,7 +350,7 @@ class TicketService:
     
     def generate_ticket_number(self):
         """
-        Genera un número único de ticket.
+        Genera un número único de ticket en formato secuencial TKT-001, TKT-002, etc.
         
         Args:
             None
@@ -358,6 +358,26 @@ class TicketService:
         Returns:
             str: Número de ticket único
         """
-        timestamp = timezone.now().strftime('%Y%m%d%H%M%S')
-        unique_id = str(uuid.uuid4())[:8].upper()
-        return f'TICKET-{timestamp}-{unique_id}'
+        # Obtener el último ticket creado
+        last_ticket = Ticket.objects.order_by('-id').first()
+        
+        if last_ticket:
+            # Extraer el número del último ticket
+            try:
+                # Buscar el patrón TKT-XXX en el número del ticket
+                match = re.search(r'TKT-(\d+)', last_ticket.ticket_number)
+                if match:
+                    last_number = int(match.group(1))
+                    next_number = last_number + 1
+                else:
+                    # Si no encuentra el patrón, empezar desde 1
+                    next_number = 1
+            except (ValueError, AttributeError):
+                # Si hay algún error, empezar desde 1
+                next_number = 1
+        else:
+            # Si no hay tickets, empezar desde 1
+            next_number = 1
+        
+        # Formatear el número con ceros a la izquierda (ej: 001, 002, 010, 100)
+        return f'TKT-{next_number:03d}'
