@@ -4,6 +4,8 @@ from company_reports.views.statistics_views import StatisticsViewSet, dashboard_
 from company_reports.views.company_views import CompanyDataViewSet
 #from company_reports.views.emails_views import dashboard_email, SendVerifyCodeAPIView, VerifyCodeAPIView
 from company_reports.views import reports_views as views
+from django.conf.urls.static import static
+from django.conf import settings
 
 router = DefaultRouter()
 router.register(r'statistics', StatisticsViewSet, basename='statistics')
@@ -29,7 +31,7 @@ export_urlpatterns = [
     path('exports/pdf/pacientes-terapeuta/', views.pdf_pacientes_terapeuta, name='pdf_pacientes_terapeuta'),
     path('exports/pdf/resumen-caja/', views.pdf_resumen_caja, name='pdf_resumen_caja'),
     path('exports/excel/citas-rango/', views.exportar_excel_citas, name='exportar_excel_citas'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 '''
 views_urlpatterns = [
     path('form/', company_form_view, name='company_form'),

@@ -3,6 +3,7 @@ from .models.payment_type import PaymentType
 from .models.document_type import DocumentType
 from .models.history import History
 from .models.predetermined_price import PredeterminedPrice
+from .models import PaymentStatus
 
 #Registrar el modelo en el admin
 @admin.register(PaymentType)
@@ -33,3 +34,7 @@ class PredeterminedPriceAdmin(admin.ModelAdmin):
     ordering = ('name',)
     readonly_fields = ('created_at', 'updated_at', 'deleted_at')
 
+@admin.register(PaymentStatus)
+class PaymentStatusAdmin(admin.ModelAdmin):
+    search_fields = ['name', 'description']  # necesario para el autocompletado
+    list_display = ['name', 'description']

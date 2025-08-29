@@ -101,11 +101,11 @@ WSGI_APPLICATION = 'settings.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'reflexo_v3_django',  # Nombre de tu base de datos
-        'USER': 'root',  # Usuario de MySQL
-        'PASSWORD': '',  # Contraseña de MySQL (ajusta según tu configuración)
-        'HOST': 'localhost',  # Host de MySQL
-        'PORT': '3306',  # Puerto de MySQL
+        'NAME': 'reflexo',
+        'USER': 'root',
+        'PASSWORD': '123456',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
         'OPTIONS': {
             'charset': 'utf8mb4',
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
