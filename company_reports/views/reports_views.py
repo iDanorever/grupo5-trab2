@@ -9,7 +9,7 @@ from company_reports.serialiazers.reports_serializers import (
     PDFContextSerializer,
 )
 from django.shortcuts import render
-from django_xhtml2pdf.utils import pdf_decorator
+# from django_xhtml2pdf.utils import pdf_decorator
 from django.views.decorators.csrf import csrf_exempt
 import xlsxwriter
 import io
@@ -138,7 +138,7 @@ class PDFExportView:
     """Responsable exclusivamente de la generación de PDFs."""
 
     @staticmethod
-    @pdf_decorator(pdfname="citas_terapeuta.pdf")
+    # @pdf_decorator(pdfname="citas_terapeuta.pdf")
     def pdf_citas_terapeuta(request):
         data_in = _merge_params(request)
         serializer = DateParameterSerializer(data=data_in)
@@ -159,7 +159,7 @@ class PDFExportView:
         return render(request, "pdf_templates/citas_terapeuta.html", context)
 
     @staticmethod
-    @pdf_decorator(pdfname="pacientes_por_terapeuta.pdf")
+    # @pdf_decorator(pdfname="pacientes_por_terapeuta.pdf")
     def pdf_pacientes_terapeuta(request):
         data_in = _merge_params(request)
         serializer = DateParameterSerializer(data=data_in)
@@ -180,7 +180,7 @@ class PDFExportView:
         return render(request, "pdf_templates/pacientes_terapeuta.html", context)
 
     @staticmethod
-    @pdf_decorator(pdfname="resumen_caja.pdf")
+    # @pdf_decorator(pdfname="resumen_caja.pdf")
     def pdf_resumen_caja(request):
         data_in = _merge_params(request)
         serializer = DateParameterSerializer(data=data_in)

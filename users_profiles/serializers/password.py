@@ -135,7 +135,7 @@ class PasswordHistorySerializer(serializers.Serializer):
     )
     
     # IP desde donde se realizó el cambio (para auditoría)
-    ip_address = serializers.IPAddressField(
+    ip_address = serializers.CharField(
         read_only=True,
         help_text='Dirección IP desde donde se cambió la contraseña'
     )
