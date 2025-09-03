@@ -23,15 +23,14 @@ class CustomUserAdmin(BaseUserAdmin):
     """
     # === Listado ===
     list_display = (
-        "user_name",          # <- antes 'username'
+        "user_name",
         "email",
-        "name",               # <- antes 'first_name'
+        "name",
         "paternal_lastname",
         "maternal_lastname",
-        "sex",
         "is_active",
         "is_staff",
-        "created_at",         # usa tus campos reales
+        "created_at",
         "updated_at",
     )
     list_display_links = ("user_name", "email")
@@ -39,7 +38,6 @@ class CustomUserAdmin(BaseUserAdmin):
         "is_active",
         "is_staff",
         "is_superuser",
-        "sex",
         "created_at",
         "updated_at",
     )
@@ -50,7 +48,6 @@ class CustomUserAdmin(BaseUserAdmin):
         "paternal_lastname",
         "maternal_lastname",
         "document_number",
-        "phone",
     )
     ordering = ("-updated_at", "-created_at")
 
@@ -61,19 +58,11 @@ class CustomUserAdmin(BaseUserAdmin):
         }),
         ("Información personal", {
             "fields": (
-                "user_name",          # <- tu alias de usuario
+                "user_name",
                 "name",
                 "paternal_lastname",
                 "maternal_lastname",
-                "sex",
-                "photo_url",
-                "phone",
-                "document_type",
                 "document_number",
-                "country",
-                "account_statement",
-                "password_change",
-                "email_verified_at",
             ),
         }),
         ("Permisos", {
@@ -81,7 +70,7 @@ class CustomUserAdmin(BaseUserAdmin):
         }),
         ("Fechas", {
             "classes": ("collapse",),
-            "fields": ("last_login", "created_at", "updated_at", "deleted_at"),
+            "fields": ("last_login", "created_at", "updated_at"),
         }),
     )
 
@@ -95,7 +84,7 @@ class CustomUserAdmin(BaseUserAdmin):
         }),
     )
 
-    readonly_fields = ("last_login", "created_at", "updated_at", "email_verified_at")
+    readonly_fields = ("last_login", "created_at", "updated_at")
 
     # Opcional: mejora UX en permisos
     filter_horizontal = ("groups", "user_permissions")

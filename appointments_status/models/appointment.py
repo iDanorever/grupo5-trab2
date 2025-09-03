@@ -9,7 +9,7 @@ class Appointment(models.Model):
     """
     
     # Relaciones con otros módulos
-    history = models.ForeignKey('histories_configurations.History', on_delete=models.CASCADE, verbose_name="Historial")
+    history = models.ForeignKey('histories_configurations.History', on_delete=models.CASCADE, null=True, blank=True, verbose_name="Historial")
     patient = models.ForeignKey('patients_diagnoses.Patient', on_delete=models.CASCADE, verbose_name="Paciente")
     therapist = models.ForeignKey('therapists.Therapist', on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Terapeuta")
     

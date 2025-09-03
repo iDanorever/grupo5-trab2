@@ -1,0 +1,57 @@
+version: '3'
+services:
+  django:
+    image: reflexo_django_prod_image
+    container_name: reflexo_django_prod
+    ports:
+      - "8000:8000"  # Mapear puerto 8000 de la máquina local al contenedor
+    depends_on:
+      - redis
+      - mysql
+      - nginx
+
+  mysql:
+    image: reflexo_mysql_prod_image
+    container_name: reflexo_mysql_prod
+    ports:
+      - "3306:3306"  # Mapear puerto MySQL
+    environment:
+      MYSQL_ROOT_PASSWORD: examplepassword
+    volumes:
+      - mysql-data:/var/lib/mysql  # Persistencia de datos
+
+  nginx:
+    image: reflexo_nginx_prod_image
+    container_name: reflexo_nginx_prod
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - django
+
+  redis:
+    image: reflexo_redis_prod_image
+    container_name: reflexo_redis_prod
+    ports:
+      - "6379:6379"  # Puerto de Redis
+    volumes:
+      - redis-data:/data  # Persistencia de datos
+
+  celery:
+    image: reflexo_celery_prod_image
+    container_name: reflexo_celery_prod
+    depends_on:
+      - redis
+      - django
+    command: /bin/bash  # Ajusta según el comando adecuado que se debe ejecutar
+
+  celery_beat:
+    image: reflexo_celery_beat_prod_image
+    container_name: reflexo_celery_beat_prod
+    depends_on:
+      - redis
+    command: /bin/bash  # Ajusta según el comando adecuado para Celery Beat
+
+volumes:
+  mysql-data:
+  redis-data:
