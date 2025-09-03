@@ -5,7 +5,7 @@
 
 # Docker
 Dockerfile
-docker-compose.yml
+docker-compose.prod.yml
 .dockerignore
 
 # Python
@@ -73,3 +73,8 @@ test_*
 # Temporary files
 *.tmp
 *.temp
+
+# Development files
+requirements.dev.txt
+env.example
+env.prod.example

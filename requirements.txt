@@ -35,9 +35,3 @@ redis==5.0.1
 celery==5.3.4
 django-celery-beat==2.8.0
 django-celery-results==2.5.1
-
-# Dependencias de desarrollo y testing
-pytest==7.4.3
-pytest-django==4.7.0
-factory-boy==3.3.0
-coverage==7.3.2
