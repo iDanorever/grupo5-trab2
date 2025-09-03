@@ -98,12 +98,82 @@ class PDFContextSerializer(serializers.Serializer):
     data = serializers.DictField(required=False)
     title = serializers.CharField()
     total = serializers.FloatField(required=False)
-    total_appointments = serializers.IntegerField(required=False)
+
+
+# Nuevos serializers para los reportes mejorados
+
+class PaymentDetailSerializer(serializers.Serializer):
+    """Serializa detalles de pagos individuales."""
     
-    def to_representation(self, instance):
-        """Formatea contexto para PDF."""
-        data = super().to_representation(instance)
-        # Asegurar que date esté en formato string
-        if hasattr(data['date'], 'strftime'):
-            data['date'] = data['date'].strftime('%Y-%m-%d')
-        return data
+    tipo = serializers.CharField()
+    id = serializers.IntegerField()
+    ticket_number = serializers.CharField()
+    monto = serializers.FloatField()
+    metodo_pago = serializers.CharField()
+    paciente = serializers.CharField()
+    terapeuta = serializers.CharField()
+    fecha_pago = serializers.CharField()
+
+
+class PaymentMethodSummarySerializer(serializers.Serializer):
+    """Serializa resumen por método de pago."""
+    
+    metodo = serializers.CharField()
+    cantidad_pagos = serializers.IntegerField()
+    total = serializers.FloatField()
+
+
+class ImprovedDailyCashSerializer(serializers.Serializer):
+    """Serializa el reporte mejorado de caja chica."""
+    
+    fecha = serializers.CharField()
+    pagos_detallados = PaymentDetailSerializer(many=True)
+    resumen_por_metodo = PaymentMethodSummarySerializer(many=True)
+    total_general = serializers.FloatField()
+    cantidad_total_pagos = serializers.IntegerField()
+
+
+class TicketDetailSerializer(serializers.Serializer):
+    """Serializa detalles de tickets pagados."""
+    
+    ticket_id = serializers.IntegerField()
+    numero_ticket = serializers.CharField()
+    monto = serializers.FloatField()
+    metodo_pago = serializers.CharField()
+    fecha_pago = serializers.CharField()
+    descripcion = serializers.CharField()
+    
+    # Información de la cita
+    cita_id = serializers.IntegerField()
+    fecha_cita = serializers.CharField()
+    hora_cita = serializers.CharField()
+    consultorio = serializers.CharField()
+    tipo_pago_cita = serializers.CharField()
+    
+    # Información del paciente
+    paciente_nombre = serializers.CharField()
+    paciente_documento = serializers.CharField()
+    paciente_telefono = serializers.CharField()
+    
+    # Información del terapeuta
+    terapeuta_nombre = serializers.CharField()
+    terapeuta_licencia = serializers.CharField()
+
+
+class TicketMethodSummarySerializer(serializers.Serializer):
+    """Serializa resumen por método de pago para tickets."""
+    
+    metodo = serializers.CharField()
+    cantidad_tickets = serializers.IntegerField()
+    total = serializers.FloatField()
+
+
+class DailyPaidTicketsSerializer(serializers.Serializer):
+    """Serializa el reporte diario de tickets pagados."""
+    
+    fecha = serializers.CharField()
+    tickets_pagados = TicketDetailSerializer(many=True)
+    resumen_por_metodo = TicketMethodSummarySerializer(many=True)
+    total_general = serializers.FloatField()
+    cantidad_tickets = serializers.IntegerField()
+    metodos_pago_utilizados = serializers.ListField(child=serializers.CharField())
