@@ -224,36 +224,36 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 #### Ejemplos de Perfiles
 
 **Obtener Mi Perfil:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** GET
 - **URL:** `{{base_url}}/api/profiles/users/me/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 
 **Respuesta:**
 ```json
 {
-  "id": 3,
-  "username": "edu",
-  "email": "xxangelx31@gmail.com",
-  "first_name": "Eduardo",
-  "last_name": "Pérez",
-  "full_name": "Eduardo Pérez",
-  "phone": "+51 999 999 999",
-  "rol": "User",
-  "is_active": true,
-  "date_joined": "2025-08-21T15:30:00Z",
-  "last_login": "2025-08-21T18:30:00Z",
-  "profile_photo_url": "http://localhost:8000/media/profile_photos/foto_perfil.jpg"
+    "id": 1,
+    "user_name": "reflexo",
+    "email": "reflexo@gmail.com",
+    "name": "Christhoper",
+    "paternal_lastname": "Sosa",
+    "maternal_lastname": "Morales",
+    "phone": null,
+    "document_number": "70529706",
+    "profile_photo_url": null,
+    "full_name": "Christhoper Sosa Morales"
 }
 ```
 
 **Actualizar Mi Perfil:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** PUT
 - **URL:** `{{base_url}}/api/profiles/users/me/update/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -261,36 +261,39 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 - **Body (raw JSON):**
   ```json
   {
-    "first_name": "Eduardo",
-    "last_name": "García",
-    "phone": "+51 888 888 888"
+    "name": "Eduardo",
+    "paternal_lastname": "García",
+    "maternal_lastname": "Castillo",
+    "phone": "+51 902 887 587"
   }
   ```
 
 **Respuesta Exitosa:**
 ```json
 {
-  "id": 3,
-  "username": "edu",
-  "email": "xxangelx31@gmail.com",
-  "first_name": "Eduardo",
-  "last_name": "García",
-  "full_name": "Eduardo García",
-  "phone": "+51 888 888 888",
-  "rol": "User",
-  "is_active": true,
-  "date_joined": "2025-08-21T15:30:00Z",
-  "last_login": "2025-08-21T18:30:00Z",
-  "profile_photo_url": "http://localhost:8000/media/profile_photos/foto_perfil.jpg"
+    "message": "Información del usuario actualizada exitosamente",
+    "user": {
+        "id": 1,
+        "user_name": "reflexo",
+        "email": "reflexo@gmail.com",
+        "name": "Eduardo",
+        "paternal_lastname": "García",
+        "maternal_lastname": "Castillo",
+        "phone": "+51 902 887 587",
+        "document_number": "70529706",
+        "profile_photo_url": null,
+        "full_name": "Eduardo García Castillo"
+    }
 }
 ```
 
 **Subir Foto de Perfil:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** POST
 - **URL:** `{{base_url}}/api/profiles/users/me/photo/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: multipart/form-data
@@ -329,36 +332,58 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 ```
 
 **Ver Mi Perfil Completo:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** GET
 - **URL:** `{{base_url}}/api/profiles/users/profile/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 
 **Respuesta:**
 ```json
 {
-  "id": 3,
-  "username": "edu",
-  "email": "xxangelx31@gmail.com",
-  "first_name": "Eduardo",
-  "last_name": "Pérez",
-  "full_name": "Eduardo Pérez",
-  "phone": "+51 999 999 999",
-  "rol": "User",
-  "is_active": true,
-  "date_joined": "2025-08-21T15:30:00Z",
-  "last_login": "2025-08-21T18:30:00Z",
-  "profile_photo_url": "http://localhost:8000/media/profile_photos/foto_perfil.jpg"
+    "id": 1,
+    "user_name": "reflexo",
+    "email": "reflexo@gmail.com",
+    "name": "Eduardo",
+    "paternal_lastname": "García",
+    "maternal_lastname": "Castillo",
+    "phone": "+51 902 887 587",
+    "document_number": "70529706",
+    "profile_photo_url": null,
+    "full_name": "Eduardo García Castillo"
 }
 ```
 
 **Buscar Usuarios:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** GET
-- **URL:** `{{base_url}}/api/profiles/users/search/?q=edu`
+- **URL:** `{{base_url}}/api/profiles/users/search/?q=eduardo`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
+  **Respuesta:**
+```json
+{
+    "count": 1,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "user_name": "reflexo",
+            "email": "reflexo@gmail.com",
+            "name": "Eduardo",
+            "paternal_lastname": "García",
+            "maternal_lastname": "Castillo",
+            "phone": "+51 902 887 587",
+            "document_number": "70529706",
+            "profile_photo_url": null,
+            "full_name": "Eduardo García Castillo"
+        }
+    ]
+}
+```
 
 ---
 
