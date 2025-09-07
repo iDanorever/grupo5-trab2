@@ -14,15 +14,19 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 
 ### Autenticación
 | Método | Endpoint | Descripción | Autenticación |
-|--------|----------|-------------|---------------|
+|--------|----------|-------------|---------------| 
 | **POST** | `/api/architect/auth/login/` | Login de usuario | No requerida |
 | **POST** | `/api/architect/auth/register/` | Registro de usuario | No requerida |
 
 #### Ejemplos de Autenticación
 
 **Login de Usuario:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** POST
 - **URL:** `{{base_url}}/api/architect/auth/login/`
+- **Auth:** Basic Auth
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -30,28 +34,28 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 - **Body (raw JSON):**
   ```json
   {
-    "email": "xxangelx31@gmail.com",
-    "password": "edu123"
+    "email": "prueba2@gmail.com",
+    "password": "prueba2//"
   }
   ```
 
 **Respuesta:**
 ```json
 {
-  "access_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-  "refresh_token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
-  "user": {
-    "id": 3,
-    "username": "edu",
-    "email": "xxangelx31@gmail.com",
-    "is_active": true
-  }
+  "email": "prueba2@gmail.com",
+  "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTc1NzM0MTIzMywiaWF0IjoxNzU3MjU0ODMzLCJqdGkiOiI4N2Q4ZmEzN2RkNWQ0M2ZkYjk1ZDE0NDRlYzE2NTM5MCIsInVzZXJfaWQiOjIxfQ.b2ETtvK_9KyXZ24Suo0MOP_8eGSu9DTblSsTA1kngpo",
+  "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU3MjU1MTMzLCJpYXQiOjE3NTcyNTQ4MzMsImp0aSI6ImY5ODg5ZmFiNTk5MTRiNTc5ZWZhMGUwYTAxMmJmMzEyIiwidXNlcl9pZCI6MjF9._gGKvinZzRPAqOrXQv_a_4ibQxXz7ytSEVLAipzf8lk",
+  "user_id": 21
 }
 ```
 
 **Registro de Usuario:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** POST
 - **URL:** `{{base_url}}/api/architect/auth/register/`
+- **Auth:** Basic Auth
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -59,21 +63,19 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 - **Body (raw JSON):**
   ```json
   {
-    "username": "nuevo_usuario",
-    "email": "nuevo@ejemplo.com",
-    "password": "MiContraseña123!",
-    "password_confirm": "MiContraseña123!"
+    "document_number": "987654300",
+    "user_name": "prueba3",
+    "email": "prueba3@gmail.com",
+    "password": "prueba3//",
+    "password_confirm": "prueba3//",
+    "phone": "987654300"
   }
   ```
 
 **Respuesta Exitosa:**
 ```json
 {
-  "id": 4,
-  "username": "nuevo_usuario",
-  "email": "nuevo@ejemplo.com",
-  "is_active": true,
-  "date_joined": "2025-08-21T18:30:00Z"
+    "message": "Usuario registrado con éxito"
 }
 ```
 
@@ -112,43 +114,44 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 #### Ejemplos de Usuarios
 
 **Listar Usuarios:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** GET
 - **URL:** `{{base_url}}/api/architect/users/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 
 **Respuesta:**
 ```json
-{
-  "count": 4,
-  "next": null,
-  "previous": null,
-  "results": [
+[
     {
-      "id": 2,
-      "username": "admin",
-      "email": "admin@example.com",
-      "is_active": true,
-      "rol": "Admin"
+        "id": 1,
+        "user_name": "reflexo",
+        "email": "reflexo@gmail.com",
+        "phone": null,
+        "is_active": true,
+        "created_at": "2025-09-04T14:11:58.099045Z",
+        "updated_at": "2025-09-05T18:44:50.359736Z"
     },
     {
-      "id": 3,
-      "username": "edu",
-      "email": "xxangelx31@gmail.com",
-      "is_active": true,
-      "rol": "User"
+        "id": 2,
+        "user_name": "frontend",
+        "email": "frontend@gmail.com",
+        "phone": null,
+        "is_active": true,
+        "created_at": "2025-09-04T16:48:57.833522Z",
+        "updated_at": "2025-09-04T16:48:57.833548Z"
     }
-  ]
-}
+]
 ```
 
 **Crear Usuario:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** POST
 - **URL:** `{{base_url}}/api/architect/users/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -156,11 +159,11 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 - **Body (raw JSON):**
   ```json
   {
-    "username": "nuevo_admin",
-    "email": "admin2@ejemplo.com",
-    "password": "Admin123!",
-    "first_name": "Juan",
-    "last_name": "Administrador",
+    "user_name": "prueba4",
+    "email": "prueba4@gmail.com",
+    "password": "Prueba4//",
+    "first_name": "Felipe",
+    "last_name": "Castillo",
     "is_staff": true,
     "is_superuser": false
   }
@@ -169,15 +172,13 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 **Respuesta Exitosa:**
 ```json
 {
-  "id": 5,
-  "username": "nuevo_admin",
-  "email": "admin2@ejemplo.com",
-  "first_name": "Juan",
-  "last_name": "Administrador",
-  "is_active": true,
-  "is_staff": true,
-  "is_superuser": false,
-  "date_joined": "2025-08-21T19:00:00Z"
+    "id": 23,
+    "user_name": "prueba4",
+    "email": "prueba4@gmail.com",
+    "phone": null,
+    "is_active": true,
+    "created_at": "2025-09-07T14:28:12.534838Z",
+    "updated_at": "2025-09-07T14:28:12.534849Z"
 }
 ```
 
@@ -187,7 +188,7 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
   "email": [
     "Este campo es requerido."
   ],
-  "username": [
+  "user_name": [
     "Este campo es requerido."
   ]
 }
@@ -201,7 +202,7 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 ```
 ```json
 {
-  "username": [
+  "user_name": [
     "Ya existe un usuario con este nombre de usuario."
   ]
 }
@@ -376,36 +377,38 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 #### Ejemplos de Pacientes
 
 **Listar Pacientes:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** GET
 - **URL:** `{{base_url}}/api/patients/patients/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 
 **Respuesta:**
 ```json
 [
-  {
-    "id": 1,
-    "document_number": "12345678",
-    "full_name": "María González López",
-    "age": 33,
-    "sex": "F",
-    "primary_phone": "+51 777 777 777",
-    "email": "maria@ejemplo.com",
-    "region_name": "Lima",
-    "document_type_name": "DNI",
-    "created_at": "2025-08-21T15:00:00Z"
-  }
+    {
+        "id": 2,
+        "document_number": "70529706",
+        "full_name": "Christhoper Smith Sosa Morales",
+        "age": 18,
+        "sex": "M",
+        "phone1": null,
+        "email": "cristofersosa159@gmail.com",
+        "region_name": "Amazonas",
+        "document_type_name": "",
+        "created_at": "2025-09-07T14:34:31.685685Z"
+    }
 ]
 ```
 
 **Crear Paciente:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** POST
 - **URL:** `{{base_url}}/api/patients/patients/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -413,14 +416,16 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 - **Body (raw JSON):**
   ```json
   {
-    "document_number": "11111111",
-    "paternal_lastname": "García",
-    "maternal_lastname": "Hernández",
-    "name": "Ana Sofía",
-    "birth_date": "1995-12-03",
-    "sex": "F",
-    "primary_phone": "+51 444 444 444",
-    "email": "ana.sofia@ejemplo.com",
+    "document_number": "70529706",
+    "paternal_lastname": "Sosa",
+    "maternal_lastname": "Morales",
+    "name": "Christhoper Smith",
+    "birth_date": "2006-09-23",
+    "sex": "M",
+    "primary_phone": "902887587",
+    "email": "cristofersosa159@gmail.com",
+    "ocupation": "Ingeniero de Sistemas",
+    "health_condition": "No tiene problemas de salud",
     "address": "Calle Nueva 123",
     "region_id": 1,
     "province_id": 1,
@@ -432,42 +437,57 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 **Respuesta Exitosa:**
 ```json
 {
-  "id": 2,
-  "document_number": "87654321",
-  "paternal_lastname": "López",
-  "maternal_lastname": "García",
-  "name": "Juan Carlos",
-  "personal_reference": null,
-  "birth_date": "1985-03-20",
-  "sex": "M",
-  "primary_phone": "+51 666 666 666",
-  "secondary_phone": null,
-  "email": "juan@ejemplo.com",
-  "ocupation": null,
-  "health_condition": null,
-  "address": "Calle Secundaria 456",
-  "region": {
-    "id": 1,
-    "name": "Lima",
-    "ubigeo_code": "15"
-  },
-  "province": {
-    "id": 1,
-    "name": "Lima",
-    "ubigeo_code": "1501"
-  },
-  "district": {
-    "id": 1,
-    "name": "Lima",
-    "ubigeo_code": "150101"
-  },
-  "document_type": {
-    "id": 1,
-    "name": "DNI",
-    "description": "Documento Nacional de Identidad"
-  },
-  "created_at": "2025-08-21T19:00:00Z",
-  "updated_at": "2025-08-21T19:00:00Z"
+    "id": 2,
+    "document_number": "70529706",
+    "paternal_lastname": "Sosa",
+    "maternal_lastname": "Morales",
+    "name": "Christhoper Smith",
+    "personal_reference": null,
+    "birth_date": "2006-09-23T00:00:00Z",
+    "sex": "M",
+    "phone1": null,
+    "phone2": null,
+    "email": "cristofersosa159@gmail.com",
+    "ocupation": "Ingeniero de Sistemas",
+    "health_condition": "No tiene problemas de salud",
+    "address": "Calle Nueva 123",
+    "region": {
+        "id": 1,
+        "name": "Amazonas",
+        "country": 180,
+        "created_at": "2025-09-04T14:18:19.089982Z",
+        "updated_at": "2025-09-04T14:18:19.090014Z",
+        "deleted_at": null
+    },
+    "province": {
+        "id": 1,
+        "name": "Chachapoyas",
+        "region": 1,
+        "region_name": "Amazonas",
+        "created_at": "2025-09-04T14:18:19.160170Z",
+        "updated_at": "2025-09-04T14:18:19.160189Z",
+        "deleted_at": null
+    },
+    "district": {
+        "id": 1,
+        "name": "Chachapoyas",
+        "province": 1,
+        "province_name": "Chachapoyas",
+        "region_name": "Amazonas",
+        "created_at": "2025-09-04T14:18:19.849401Z",
+        "updated_at": "2025-09-04T14:18:19.849435Z",
+        "deleted_at": null
+    },
+    "document_type": {
+        "id": 1,
+        "name": "",
+        "created_at": "2025-09-04T14:22:53.387296Z",
+        "updated_at": "2025-09-04T14:22:53.387343Z",
+        "deleted_at": "2025-09-05T17:52:37.224379Z"
+    },
+    "created_at": "2025-09-07T14:34:31.685685Z",
+    "updated_at": "2025-09-07T14:34:31.685696Z",
+    "deleted_at": null
 }
 ```
 
@@ -475,40 +495,23 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 
 **Ejemplo 2:**
 ```json
-{
-  "document_number": "22222222",
-  "paternal_lastname": "López",
-  "maternal_lastname": "Morales",
-  "name": "Roberto Carlos",
-  "birth_date": "1988-04-18",
-  "sex": "M",
-  "primary_phone": "+51 333 333 333",
-  "email": "roberto.carlos@ejemplo.com",
-  "address": "Av. Libertad 456",
-  "region_id": 1,
-  "province_id": 1,
-  "district_id": 1,
-  "document_type_id": 1
-}
-```
-
-**Ejemplo 3:**
-```json
-{
-  "document_number": "33333333",
-  "paternal_lastname": "Ramírez",
-  "maternal_lastname": "Vargas",
-  "name": "María Elena",
-  "birth_date": "1990-09-25",
-  "sex": "F",
-  "primary_phone": "+51 222 222 222",
-  "email": "maria.elena@ejemplo.com",
-  "address": "Jr. San Martín 789",
-  "region_id": 1,
-  "province_id": 1,
-  "district_id": 1,
-  "document_type_id": 1
-}
+  {
+    "document_number": "11111111",
+    "paternal_lastname": "Pruea2",
+    "maternal_lastname": "Pruea2",
+    "name": "Pruea2 Pruea2",
+    "birth_date": "2000-01-01",
+    "sex": "M",
+    "primary_phone": "987654321",
+    "email": "Pruea2@gmail.com",
+    "ocupation": "Ingeniero de Sistemas",
+    "health_condition": "No tiene problemas de salud",
+    "address": "Calle Nueva 123",
+    "region_id": 1,
+    "province_id": 1,
+    "district_id": 1,
+    "document_type_id": 1
+  }
 ```
 
 **Posibles Errores de Validación:**
@@ -544,60 +547,77 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 ```
 
 **Ver Paciente Específico:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** GET
-- **URL:** `{{base_url}}/api/patients/patients/1/`
+- **URL:** `{{base_url}}/api/patients/patients/2/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 
 **Respuesta:**
 ```json
 {
-  "id": 1,
-  "document_number": "12345678",
-  "paternal_lastname": "González",
-  "maternal_lastname": "López",
-  "name": "María",
-  "personal_reference": null,
-  "birth_date": "1990-05-15",
-  "sex": "F",
-  "primary_phone": "+51 777 777 777",
-  "secondary_phone": null,
-  "email": "maria@ejemplo.com",
-  "ocupation": null,
-  "health_condition": null,
-  "address": "Av. Principal 123",
-  "region": {
-    "id": 1,
-    "name": "Lima",
-    "ubigeo_code": "15"
-  },
-  "province": {
-    "id": 1,
-    "name": "Lima",
-    "ubigeo_code": "1501"
-  },
-  "district": {
-    "id": 1,
-    "name": "Lima",
-    "ubigeo_code": "150101"
-  },
-  "document_type": {
-    "id": 1,
-    "name": "DNI",
-    "description": "Documento Nacional de Identidad"
-  },
-  "created_at": "2025-08-21T15:00:00Z",
-  "updated_at": "2025-08-21T15:00:00Z"
+    "id": 2,
+    "document_number": "70529706",
+    "paternal_lastname": "Sosa",
+    "maternal_lastname": "Morales",
+    "name": "Christhoper Smith",
+    "personal_reference": null,
+    "birth_date": "2006-09-23T00:00:00Z",
+    "sex": "M",
+    "phone1": null,
+    "phone2": null,
+    "email": "cristofersosa159@gmail.com",
+    "ocupation": "Ingeniero de Sistemas",
+    "health_condition": "No tiene problemas de salud",
+    "address": "Calle Nueva 123",
+    "region": {
+        "id": 1,
+        "name": "Amazonas",
+        "country": 180,
+        "created_at": "2025-09-04T14:18:19.089982Z",
+        "updated_at": "2025-09-04T14:18:19.090014Z",
+        "deleted_at": null
+    },
+    "province": {
+        "id": 1,
+        "name": "Chachapoyas",
+        "region": 1,
+        "region_name": "Amazonas",
+        "created_at": "2025-09-04T14:18:19.160170Z",
+        "updated_at": "2025-09-04T14:18:19.160189Z",
+        "deleted_at": null
+    },
+    "district": {
+        "id": 1,
+        "name": "Chachapoyas",
+        "province": 1,
+        "province_name": "Chachapoyas",
+        "region_name": "Amazonas",
+        "created_at": "2025-09-04T14:18:19.849401Z",
+        "updated_at": "2025-09-04T14:18:19.849435Z",
+        "deleted_at": null
+    },
+    "document_type": {
+        "id": 1,
+        "name": "",
+        "created_at": "2025-09-04T14:22:53.387296Z",
+        "updated_at": "2025-09-04T14:22:53.387343Z",
+        "deleted_at": "2025-09-05T17:52:37.224379Z"
+    },
+    "created_at": "2025-09-07T14:34:31.685685Z",
+    "updated_at": "2025-09-07T14:34:31.685696Z",
+    "deleted_at": null
 }
 ```
 
 **Actualizar Paciente:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** PUT
 - **URL:** `{{base_url}}/api/patients/patients/1/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -605,15 +625,17 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 - **Body (raw JSON):**
   ```json
   {
-    "document_number": "12345678",
-    "paternal_lastname": "González",
-    "maternal_lastname": "López",
-    "name": "María Elena",
-    "birth_date": "1990-05-15",
-    "sex": "F",
-    "primary_phone": "+51 777 777 777",
-    "email": "maria.actualizada@ejemplo.com",
-    "address": "Av. Principal 123, Lima",
+    "document_number": "11111123",
+    "paternal_lastname": "Pruea2",
+    "maternal_lastname": "Pruea2",
+    "name": "Pruea2 Pruea2",
+    "birth_date": "2000-01-01",
+    "sex": "M",
+    "primary_phone": "987654321",
+    "email": "Pruea2@gmail.com",
+    "ocupation": "Ingeniero de Sistemas",
+    "health_condition": "No tiene problemas de salud",
+    "address": "Calle Nueva 123",
     "region_id": 1,
     "province_id": 1,
     "district_id": 1,
@@ -624,42 +646,57 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 **Respuesta Exitosa:**
 ```json
 {
-  "id": 1,
-  "document_number": "12345678",
-  "paternal_lastname": "González",
-  "maternal_lastname": "López",
-  "name": "María Elena",
-  "personal_reference": null,
-  "birth_date": "1990-05-15",
-  "sex": "F",
-  "primary_phone": "+51 777 777 777",
-  "secondary_phone": null,
-  "email": "maria.actualizada@ejemplo.com",
-  "ocupation": null,
-  "health_condition": null,
-  "address": "Av. Principal 123, Lima",
-  "region": {
-    "id": 1,
-    "name": "Lima",
-    "ubigeo_code": "15"
-  },
-  "province": {
-    "id": 1,
-    "name": "Lima",
-    "ubigeo_code": "1501"
-  },
-  "district": {
-    "id": 1,
-    "name": "Lima",
-    "ubigeo_code": "150101"
-  },
-  "document_type": {
-    "id": 1,
-    "name": "DNI",
-    "description": "Documento Nacional de Identidad"
-  },
-  "created_at": "2025-08-21T15:00:00Z",
-  "updated_at": "2025-08-21T19:30:00Z"
+    "id": 2,
+    "document_number": "11111123",
+    "paternal_lastname": "Pruea2",
+    "maternal_lastname": "Pruea2",
+    "name": "Pruea2 Pruea2",
+    "personal_reference": null,
+    "birth_date": "2000-01-01T00:00:00Z",
+    "sex": "M",
+    "phone1": null,
+    "phone2": null,
+    "email": "Pruea2@gmail.com",
+    "ocupation": "Ingeniero de Sistemas",
+    "health_condition": "No tiene problemas de salud",
+    "address": "Calle Nueva 123",
+    "region": {
+        "id": 1,
+        "name": "Amazonas",
+        "country": 180,
+        "created_at": "2025-09-04T14:18:19.089982Z",
+        "updated_at": "2025-09-04T14:18:19.090014Z",
+        "deleted_at": null
+    },
+    "province": {
+        "id": 1,
+        "name": "Chachapoyas",
+        "region": 1,
+        "region_name": "Amazonas",
+        "created_at": "2025-09-04T14:18:19.160170Z",
+        "updated_at": "2025-09-04T14:18:19.160189Z",
+        "deleted_at": null
+    },
+    "district": {
+        "id": 1,
+        "name": "Chachapoyas",
+        "province": 1,
+        "province_name": "Chachapoyas",
+        "region_name": "Amazonas",
+        "created_at": "2025-09-04T14:18:19.849401Z",
+        "updated_at": "2025-09-04T14:18:19.849435Z",
+        "deleted_at": null
+    },
+    "document_type": {
+        "id": 1,
+        "name": "",
+        "created_at": "2025-09-04T14:22:53.387296Z",
+        "updated_at": "2025-09-04T14:22:53.387343Z",
+        "deleted_at": "2025-09-05T17:52:37.224379Z"
+    },
+    "created_at": "2025-09-07T14:34:31.685685Z",
+    "updated_at": "2025-09-07T14:34:31.685696Z",
+    "deleted_at": null
 }
 ```
 
@@ -687,18 +724,20 @@ Todas las APIs siguen el patrón: `/api/[modulo]/[recurso]/`
 ```
 
 **Buscar Pacientes:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** GET
 - **URL:** `{{base_url}}/api/patients/patients/search/?q=maria`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 
 **Eliminar Paciente:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** DELETE
 - **URL:** `{{base_url}}/api/patients/patients/1/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 
 **Respuesta Exitosa:**
 ```
@@ -726,12 +765,47 @@ Body: (vacío)
 
 #### Ejemplos de Diagnósticos
 
+**Obtener DiagnósticoS:**
+- **Base URL:** `http://178.156.204.38/`
+- **Método:** GET
+- **URL:** `{{base_url}}/api/patients/diagnoses/`
+- **Auth:** Basic Auth
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
+- **Headers:**
+  ```
+  Content-Type: application/json
+  ```
+- **Respuesta Exitosa:**
+  ```json
+  {
+    "count": 2,
+    "num_pages": 1,
+    "current_page": 1,
+    "results": [
+        {
+            "id": 3,
+            "code": "AS122",
+            "name": "Prueba1",
+            "created_at": "2025-09-07T14:45:35.059687Z"
+        },
+        {
+            "id": 2,
+            "code": "AS123",
+            "name": "XD",
+            "created_at": "2025-09-07T14:44:30.623096Z"
+        }
+    ]
+  }
+  ```
+
 **Crear Diagnóstico:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** POST
 - **URL:** `{{base_url}}/api/patients/diagnoses/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -739,21 +813,20 @@ Body: (vacío)
 - **Body (raw JSON):**
   ```json
   {
-    "code": "D001",
-    "name": "Dolor lumbar crónico",
-    "description": "Dolor persistente en la zona lumbar que puede irradiarse a las piernas"
+    "code": "AS122",
+    "name": "Prueba1"
   }
   ```
 
 **Respuesta Exitosa:**
 ```json
 {
-  "id": 1,
-  "code": "D001",
-  "name": "Dolor lumbar crónico",
-  "description": "Dolor persistente en la zona lumbar que puede irradiarse a las piernas",
-  "created_at": "2025-08-21T16:00:00Z",
-  "updated_at": "2025-08-21T16:00:00Z"
+    "id": 3,
+    "code": "AS122",
+    "name": "Prueba1",
+    "created_at": "2025-09-07T14:45:35.059687Z",
+    "updated_at": "2025-09-07T14:45:35.059711Z",
+    "deleted_at": null
 }
 ```
 
@@ -763,8 +836,7 @@ Body: (vacío)
 ```json
 {
   "code": "D002",
-  "name": "Cefalea tensional",
-  "description": "Dolor de cabeza causado por tensión muscular en cuello y hombros"
+  "name": "Cefalea tensional"
 }
 ```
 
@@ -772,17 +844,17 @@ Body: (vacío)
 ```json
 {
   "code": "D003",
-  "name": "Artritis reumatoide",
-  "description": "Enfermedad inflamatoria crónica que afecta las articulaciones"
+  "name": "Artritis reumatoide"
 }
 ```
 
 **Actualizar Diagnóstico:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** PUT
 - **URL:** `{{base_url}}/api/patients/diagnoses/1/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -790,21 +862,23 @@ Body: (vacío)
 - **Body (raw JSON):**
   ```json
   {
-    "code": "D001",
-    "name": "Dolor lumbar crónico - Actualizado",
-    "description": "Dolor persistente en la zona lumbar que puede irradiarse a las piernas. Diagnóstico actualizado con nueva información."
+    "code": "AS100",
+    "name": "Prueba2",
+    "created_at": "2025-09-07T14:45:35.059687Z",
+    "updated_at": "2025-09-07T14:49:03.283668Z",
+    "deleted_at": null
   }
   ```
 
 **Respuesta Exitosa:**
 ```json
 {
-  "id": 1,
-  "code": "D001",
-  "name": "Dolor lumbar crónico - Actualizado",
-  "description": "Dolor persistente en la zona lumbar que puede irradiarse a las piernas. Diagnóstico actualizado con nueva información.",
-  "created_at": "2025-08-21T16:00:00Z",
-  "updated_at": "2025-08-21T19:30:00Z"
+    "id": 3,
+    "code": "AS100",
+    "name": "Prueba2",
+    "created_at": "2025-09-07T14:45:35.059687Z",
+    "updated_at": "2025-09-07T14:49:18.548643Z",
+    "deleted_at": null
 }
 ```
 
@@ -842,22 +916,24 @@ Body: (vacío)
 ```
 
 **Buscar Diagnósticos:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** GET
-- **URL:** `{{base_url}}/api/patients/diagnoses/search/?q=dolor`
+- **URL:** `{{base_url}}/api/patients/diagnoses/search/?q=Prueba2`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 
 **Respuesta Exitosa:**
 ```json
 [
-  {
-    "id": 1,
-    "code": "D001",
-    "name": "Dolor lumbar crónico",
-    "description": "Dolor persistente en la zona lumbar que puede irradiarse a las piernas",
-    "created_at": "2025-08-21T16:00:00Z"
-  }
+    {
+        "id": 3,
+        "code": "AS100",
+        "name": "Prueba2",
+        "created_at": "2025-09-07T14:45:35.059687Z",
+        "updated_at": "2025-09-07T14:49:18.548643Z",
+        "deleted_at": null
+    }
 ]
 ```
 
@@ -895,58 +971,82 @@ Body: (vacío)
 #### Ejemplos de Terapeutas
 
 **Listar Terapeutas:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** GET
 - **URL:** `{{base_url}}/api/therapists/therapists/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
-
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 **Respuesta:**
 ```json
 {
-  "count": 1,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "id": 1,
-      "document_type_id": "1",
-      "document_number": "12345678",
-      "first_name": "Ana",
-      "last_name_paternal": "García",
-      "last_name_maternal": "López",
-      "birth_date": "1990-01-01",
-      "gender": "F",
-      "phone": "999999999",
-      "email": "ana@gmail.com",
-      "address": "Av. Siempre Viva 123",
-      "is_active": true,
-      "region_fk": {
-        "id": 1,
-        "name": "Lima",
-        "ubigeo_code": "15"
-      },
-      "province_fk": {
-        "id": 1,
-        "name": "Lima",
-        "ubigeo_code": "1501"
-      },
-      "district_fk": {
-        "id": 1,
-        "name": "Lima",
-        "ubigeo_code": "150101"
-      }
-    }
-  ]
+    "count": 1,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "document_type": {
+                "id": 2,
+                "name": "DNI",
+                "created_at": "2025-09-04T14:23:06.353132Z",
+                "updated_at": "2025-09-04T14:23:06.353168Z",
+                "deleted_at": null
+            },
+            "document_number": "87654321",
+            "last_name_paternal": "Rodríguez",
+            "last_name_maternal": "Martínez",
+            "first_name": "Carlos",
+            "birth_date": "1988-07-15T00:00:00Z",
+            "gender": "M",
+            "personal_reference": null,
+            "is_active": true,
+            "phone": "888888888",
+            "email": "carlos@gmail.com",
+            "region": {
+                "id": 1,
+                "name": "Amazonas",
+                "country": 180,
+                "created_at": "2025-09-04T14:18:19.089982Z",
+                "updated_at": "2025-09-04T14:18:19.090014Z",
+                "deleted_at": null
+            },
+            "province": {
+                "id": 1,
+                "name": "Chachapoyas",
+                "region": 1,
+                "region_name": "Amazonas",
+                "created_at": "2025-09-04T14:18:19.160170Z",
+                "updated_at": "2025-09-04T14:18:19.160189Z",
+                "deleted_at": null
+            },
+            "district": {
+                "id": 1,
+                "name": "Chachapoyas",
+                "province": 1,
+                "province_name": "Chachapoyas",
+                "region_name": "Amazonas",
+                "created_at": "2025-09-04T14:18:19.849401Z",
+                "updated_at": "2025-09-04T14:18:19.849435Z",
+                "deleted_at": null
+            },
+            "address": "Calle Principal 456",
+            "profile_picture": null,
+            "created_at": "2025-09-04T14:25:06.253837Z",
+            "updated_at": "2025-09-04T14:25:06.253853Z",
+            "deleted_at": null
+        }
+    ]
 }
 ```
 
 **Crear Terapeuta:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** POST
 - **URL:** `{{base_url}}/api/therapists/therapists/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -955,41 +1055,330 @@ Body: (vacío)
   ```json
   {
     "document_type_id": "1",
-    "document_number": "87654321",
-    "first_name": "Carlos",
-    "last_name_paternal": "Rodríguez",
-    "last_name_maternal": "Martínez",
-    "birth_date": "1988-07-15",
+    "document_number": "70529706",
+    "first_name": "Christhoper",
+    "last_name_paternal": "Sosa",
+    "last_name_maternal": "Morales",
+    "birth_date": "2006-09-23",
     "gender": "M",
-    "phone": "888888888",
-    "email": "carlos@gmail.com",
+    "phone": "902887587",
+    "email": "cristofersosa@gmail.com",
     "address": "Calle Principal 456",
-    "region_fk_id": 1,
-    "province_fk_id": 1,
-    "district_fk_id": 1
+    "region_id": 1,
+    "province_id": 1,
+    "district_id": 1
   }
   ```
 
+  **Respuesta Exitosa:**
+```json
+{
+    "id": 2,
+    "document_type": {
+        "id": 1,
+        "name": "",
+        "created_at": "2025-09-04T14:22:53.387296Z",
+        "updated_at": "2025-09-04T14:22:53.387343Z",
+        "deleted_at": "2025-09-05T17:52:37.224379Z"
+    },
+    "document_number": "70529706",
+    "last_name_paternal": "Sosa",
+    "last_name_maternal": "Morales",
+    "first_name": "Christhoper",
+    "birth_date": "2006-09-23T00:00:00Z",
+    "gender": "M",
+    "personal_reference": null,
+    "is_active": true,
+    "phone": "902887587",
+    "email": "cristofersosa@gmail.com",
+    "region": {
+        "id": 1,
+        "name": "Amazonas",
+        "country": 180,
+        "created_at": "2025-09-04T14:18:19.089982Z",
+        "updated_at": "2025-09-04T14:18:19.090014Z",
+        "deleted_at": null
+    },
+    "province": {
+        "id": 1,
+        "name": "Chachapoyas",
+        "region": 1,
+        "region_name": "Amazonas",
+        "created_at": "2025-09-04T14:18:19.160170Z",
+        "updated_at": "2025-09-04T14:18:19.160189Z",
+        "deleted_at": null
+    },
+    "district": {
+        "id": 1,
+        "name": "Chachapoyas",
+        "province": 1,
+        "province_name": "Chachapoyas",
+        "region_name": "Amazonas",
+        "created_at": "2025-09-04T14:18:19.849401Z",
+        "updated_at": "2025-09-04T14:18:19.849435Z",
+        "deleted_at": null
+    },
+    "address": "Calle Principal 456",
+    "profile_picture": null,
+    "created_at": "2025-09-07T14:53:18.322073Z",
+    "updated_at": "2025-09-07T14:53:18.322083Z",
+    "deleted_at": null
+}
+```
+
 **Buscar Terapeutas:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** GET
-- **URL:** `{{base_url}}/api/therapists/therapists/?search=ana`
+- **URL:** `{{base_url}}/api/therapists/therapists/?search=Christhoper`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
+
+      **Respuesta Exitosa:**
+```json
+{
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "document_type": {
+                "id": 1,
+                "name": "",
+                "created_at": "2025-09-04T14:22:53.387296Z",
+                "updated_at": "2025-09-04T14:22:53.387343Z",
+                "deleted_at": "2025-09-05T17:52:37.224379Z"
+            },
+            "document_number": "70529705",
+            "last_name_paternal": "Sosa",
+            "last_name_maternal": "Morales",
+            "first_name": "Christhoper",
+            "birth_date": "2006-05-05T00:00:00Z",
+            "gender": "M",
+            "personal_reference": null,
+            "is_active": true,
+            "phone": "902887587",
+            "email": "cristofersosa@gmail.com",
+            "region": {
+                "id": 1,
+                "name": "Amazonas",
+                "country": 180,
+                "created_at": "2025-09-04T14:18:19.089982Z",
+                "updated_at": "2025-09-04T14:18:19.090014Z",
+                "deleted_at": null
+            },
+            "province": {
+                "id": 1,
+                "name": "Chachapoyas",
+                "region": 1,
+                "region_name": "Amazonas",
+                "created_at": "2025-09-04T14:18:19.160170Z",
+                "updated_at": "2025-09-04T14:18:19.160189Z",
+                "deleted_at": null
+            },
+            "district": {
+                "id": 1,
+                "name": "Chachapoyas",
+                "province": 1,
+                "province_name": "Chachapoyas",
+                "region_name": "Amazonas",
+                "created_at": "2025-09-04T14:18:19.849401Z",
+                "updated_at": "2025-09-04T14:18:19.849435Z",
+                "deleted_at": null
+            },
+            "address": "Calle Principal 456",
+            "profile_picture": null,
+            "created_at": "2025-09-04T14:25:06.253837Z",
+            "updated_at": "2025-09-07T14:57:20.881730Z",
+            "deleted_at": null
+        },
+        {
+            "id": 2,
+            "document_type": {
+                "id": 1,
+                "name": "",
+                "created_at": "2025-09-04T14:22:53.387296Z",
+                "updated_at": "2025-09-04T14:22:53.387343Z",
+                "deleted_at": "2025-09-05T17:52:37.224379Z"
+            },
+            "document_number": "70529706",
+            "last_name_paternal": "Sosa",
+            "last_name_maternal": "Morales",
+            "first_name": "Christhoper",
+            "birth_date": "2006-09-23T00:00:00Z",
+            "gender": "M",
+            "personal_reference": null,
+            "is_active": true,
+            "phone": "902887587",
+            "email": "cristofersosa@gmail.com",
+            "region": {
+                "id": 1,
+                "name": "Amazonas",
+                "country": 180,
+                "created_at": "2025-09-04T14:18:19.089982Z",
+                "updated_at": "2025-09-04T14:18:19.090014Z",
+                "deleted_at": null
+            },
+            "province": {
+                "id": 1,
+                "name": "Chachapoyas",
+                "region": 1,
+                "region_name": "Amazonas",
+                "created_at": "2025-09-04T14:18:19.160170Z",
+                "updated_at": "2025-09-04T14:18:19.160189Z",
+                "deleted_at": null
+            },
+            "district": {
+                "id": 1,
+                "name": "Chachapoyas",
+                "province": 1,
+                "province_name": "Chachapoyas",
+                "region_name": "Amazonas",
+                "created_at": "2025-09-04T14:18:19.849401Z",
+                "updated_at": "2025-09-04T14:18:19.849435Z",
+                "deleted_at": null
+            },
+            "address": "Calle Principal 456",
+            "profile_picture": null,
+            "created_at": "2025-09-07T14:53:18.322073Z",
+            "updated_at": "2025-09-07T14:53:18.322083Z",
+            "deleted_at": null
+        }
+    ]
+}
+```
 
 **Filtrar por Región:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** GET
 - **URL:** `{{base_url}}/api/therapists/therapists/?region=1`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
+
+    **Respuesta Exitosa:**
+```json
+{
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 1,
+            "document_type": {
+                "id": 2,
+                "name": "DNI",
+                "created_at": "2025-09-04T14:23:06.353132Z",
+                "updated_at": "2025-09-04T14:23:06.353168Z",
+                "deleted_at": null
+            },
+            "document_number": "87654321",
+            "last_name_paternal": "Rodríguez",
+            "last_name_maternal": "Martínez",
+            "first_name": "Carlos",
+            "birth_date": "1988-07-15T00:00:00Z",
+            "gender": "M",
+            "personal_reference": null,
+            "is_active": true,
+            "phone": "888888888",
+            "email": "carlos@gmail.com",
+            "region": {
+                "id": 1,
+                "name": "Amazonas",
+                "country": 180,
+                "created_at": "2025-09-04T14:18:19.089982Z",
+                "updated_at": "2025-09-04T14:18:19.090014Z",
+                "deleted_at": null
+            },
+            "province": {
+                "id": 1,
+                "name": "Chachapoyas",
+                "region": 1,
+                "region_name": "Amazonas",
+                "created_at": "2025-09-04T14:18:19.160170Z",
+                "updated_at": "2025-09-04T14:18:19.160189Z",
+                "deleted_at": null
+            },
+            "district": {
+                "id": 1,
+                "name": "Chachapoyas",
+                "province": 1,
+                "province_name": "Chachapoyas",
+                "region_name": "Amazonas",
+                "created_at": "2025-09-04T14:18:19.849401Z",
+                "updated_at": "2025-09-04T14:18:19.849435Z",
+                "deleted_at": null
+            },
+            "address": "Calle Principal 456",
+            "profile_picture": null,
+            "created_at": "2025-09-04T14:25:06.253837Z",
+            "updated_at": "2025-09-04T14:25:06.253853Z",
+            "deleted_at": null
+        },
+        {
+            "id": 2,
+            "document_type": {
+                "id": 1,
+                "name": "",
+                "created_at": "2025-09-04T14:22:53.387296Z",
+                "updated_at": "2025-09-04T14:22:53.387343Z",
+                "deleted_at": "2025-09-05T17:52:37.224379Z"
+            },
+            "document_number": "70529706",
+            "last_name_paternal": "Sosa",
+            "last_name_maternal": "Morales",
+            "first_name": "Christhoper",
+            "birth_date": "2006-09-23T00:00:00Z",
+            "gender": "M",
+            "personal_reference": null,
+            "is_active": true,
+            "phone": "902887587",
+            "email": "cristofersosa@gmail.com",
+            "region": {
+                "id": 1,
+                "name": "Amazonas",
+                "country": 180,
+                "created_at": "2025-09-04T14:18:19.089982Z",
+                "updated_at": "2025-09-04T14:18:19.090014Z",
+                "deleted_at": null
+            },
+            "province": {
+                "id": 1,
+                "name": "Chachapoyas",
+                "region": 1,
+                "region_name": "Amazonas",
+                "created_at": "2025-09-04T14:18:19.160170Z",
+                "updated_at": "2025-09-04T14:18:19.160189Z",
+                "deleted_at": null
+            },
+            "district": {
+                "id": 1,
+                "name": "Chachapoyas",
+                "province": 1,
+                "province_name": "Chachapoyas",
+                "region_name": "Amazonas",
+                "created_at": "2025-09-04T14:18:19.849401Z",
+                "updated_at": "2025-09-04T14:18:19.849435Z",
+                "deleted_at": null
+            },
+            "address": "Calle Principal 456",
+            "profile_picture": null,
+            "created_at": "2025-09-07T14:53:18.322073Z",
+            "updated_at": "2025-09-07T14:53:18.322083Z",
+            "deleted_at": null
+        }
+    ]
+}
+```
 
 **Actualizar Terapeuta:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** PUT
 - **URL:** `{{base_url}}/api/therapists/therapists/1/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -998,53 +1387,74 @@ Body: (vacío)
   ```json
   {
     "document_type_id": "1",
-    "document_number": "12345678",
-    "first_name": "Ana María",
-    "last_name_paternal": "García",
-    "last_name_maternal": "López",
-    "birth_date": "1990-01-01",
-    "gender": "F",
-    "phone": "999999999",
-    "email": "ana.actualizada@gmail.com",
-    "address": "Av. Siempre Viva 123, Lima",
-    "region_fk_id": 1,
-    "province_fk_id": 1,
-    "district_fk_id": 1
+    "document_number": "70529705",
+    "first_name": "Christhoper",
+    "last_name_paternal": "Sosa",
+    "last_name_maternal": "Morales",
+    "birth_date": "2006-05-05",
+    "gender": "M",
+    "phone": "902887587",
+    "email": "cristofersosa@gmail.com",
+    "address": "Calle Principal 456",
+    "region_id": 1,
+    "province_id": 1,
+    "district_id": 1
   }
   ```
 
 **Respuesta Exitosa:**
 ```json
 {
-  "id": 1,
-  "document_type_id": "1",
-  "document_number": "12345678",
-  "first_name": "Ana María",
-  "last_name_paternal": "García",
-  "last_name_maternal": "López",
-  "birth_date": "1990-01-01",
-  "gender": "F",
-  "phone": "999999999",
-  "email": "ana.actualizada@gmail.com",
-  "address": "Av. Siempre Viva 123, Lima",
-  "is_active": true,
-  "region_fk": {
     "id": 1,
-    "name": "Lima",
-    "ubigeo_code": "15"
-  },
-  "province_fk": {
-    "id": 1,
-    "name": "Lima",
-    "ubigeo_code": "1501"
-  },
-  "district_fk": {
-    "id": 1,
-    "name": "Lima",
-    "ubigeo_code": "150101"
-  },
-  "created_at": "2025-08-21T16:00:00Z",
-  "updated_at": "2025-08-21T19:30:00Z"
+    "document_type": {
+        "id": 1,
+        "name": "",
+        "created_at": "2025-09-04T14:22:53.387296Z",
+        "updated_at": "2025-09-04T14:22:53.387343Z",
+        "deleted_at": "2025-09-05T17:52:37.224379Z"
+    },
+    "document_number": "70529705",
+    "last_name_paternal": "Sosa",
+    "last_name_maternal": "Morales",
+    "first_name": "Christhoper",
+    "birth_date": "2006-05-05T00:00:00Z",
+    "gender": "M",
+    "personal_reference": null,
+    "is_active": true,
+    "phone": "902887587",
+    "email": "cristofersosa@gmail.com",
+    "region": {
+        "id": 1,
+        "name": "Amazonas",
+        "country": 180,
+        "created_at": "2025-09-04T14:18:19.089982Z",
+        "updated_at": "2025-09-04T14:18:19.090014Z",
+        "deleted_at": null
+    },
+    "province": {
+        "id": 1,
+        "name": "Chachapoyas",
+        "region": 1,
+        "region_name": "Amazonas",
+        "created_at": "2025-09-04T14:18:19.160170Z",
+        "updated_at": "2025-09-04T14:18:19.160189Z",
+        "deleted_at": null
+    },
+    "district": {
+        "id": 1,
+        "name": "Chachapoyas",
+        "province": 1,
+        "province_name": "Chachapoyas",
+        "region_name": "Amazonas",
+        "created_at": "2025-09-04T14:18:19.849401Z",
+        "updated_at": "2025-09-04T14:18:19.849435Z",
+        "deleted_at": null
+    },
+    "address": "Calle Principal 456",
+    "profile_picture": null,
+    "created_at": "2025-09-04T14:25:06.253837Z",
+    "updated_at": "2025-09-07T14:57:20.881730Z",
+    "deleted_at": null
 }
 ```
 
@@ -1077,11 +1487,12 @@ Body: (vacío)
 ```
 
 **Restaurar Terapeuta:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** POST
 - **URL:** `{{base_url}}/api/therapists/therapists/1/restore/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -1094,44 +1505,61 @@ Body: (vacío)
 **Respuesta Exitosa:**
 ```json
 {
-  "id": 1,
-  "document_type_id": "1",
-  "document_number": "12345678",
-  "first_name": "Ana María",
-  "last_name_paternal": "García",
-  "last_name_maternal": "López",
-  "birth_date": "1990-01-01",
-  "gender": "F",
-  "phone": "999999999",
-  "email": "ana.actualizada@gmail.com",
-  "address": "Av. Siempre Viva 123, Lima",
-  "is_active": true,
-  "region_fk": {
-    "id": 1,
-    "name": "Lima",
-    "ubigeo_code": "15"
-  },
-  "province_fk": {
-    "id": 1,
-    "name": "Lima",
-    "ubigeo_code": "1501"
-  },
-  "district_fk": {
-    "id": 1,
-    "name": "Lima",
-    "ubigeo_code": "150101"
-  },
-  "created_at": "2025-08-21T16:00:00Z",
-  "updated_at": "2025-08-21T19:30:00Z"
+    "id": 3,
+    "document_type": {
+        "id": 1,
+        "name": "",
+        "created_at": "2025-09-04T14:22:53.387296Z",
+        "updated_at": "2025-09-04T14:22:53.387343Z",
+        "deleted_at": "2025-09-05T17:52:37.224379Z"
+    },
+    "document_number": "70239706",
+    "last_name_paternal": "Soaasa",
+    "last_name_maternal": "Moraaales",
+    "first_name": "Christhopeer",
+    "birth_date": "2006-09-13T00:00:00Z",
+    "gender": "M",
+    "personal_reference": null,
+    "is_active": true,
+    "phone": "902237587",
+    "email": "cristosa@gmail.com",
+    "region": {
+        "id": 1,
+        "name": "Amazonas",
+        "country": 180,
+        "created_at": "2025-09-04T14:18:19.089982Z",
+        "updated_at": "2025-09-04T14:18:19.090014Z",
+        "deleted_at": null
+    },
+    "province": {
+        "id": 1,
+        "name": "Chachapoyas",
+        "region": 1,
+        "region_name": "Amazonas",
+        "created_at": "2025-09-04T14:18:19.160170Z",
+        "updated_at": "2025-09-04T14:18:19.160189Z",
+        "deleted_at": null
+    },
+    "district": {
+        "id": 1,
+        "name": "Chachapoyas",
+        "province": 1,
+        "province_name": "Chachapoyas",
+        "region_name": "Amazonas",
+        "created_at": "2025-09-04T14:18:19.849401Z",
+        "updated_at": "2025-09-04T14:18:19.849435Z",
+        "deleted_at": null
+    },
+    "address": "Calle Principal 456",
+    "profile_picture": null,
+    "created_at": "2025-09-07T16:28:00.727649Z",
+    "updated_at": "2025-09-07T17:05:17.725649Z",
+    "deleted_at": null
 }
 ```
 
 **Posibles Errores:**
-```json
-{
-  "detail": "El terapeuta ya está activo."
-}
-```
+
 ```json
 {
   "detail": "Terapeuta no encontrado."
@@ -1144,157 +1572,6 @@ Body: (vacío)
 - **Cambia `is_active`** de `false` a `true`
 - **Mantiene** todos los datos originales del terapeuta
 
-### Especialidades
-| Método | Endpoint | Descripción | Autenticación |
-|--------|----------|-------------|---------------|
-| **GET** | `/api/therapists/specializations/` | Listar especialidades | Requerida |
-| **POST** | `/api/therapists/specializations/` | Crear especialidad | Requerida |
-| **GET** | `/api/therapists/specializations/{id}/` | Ver especialidad | Requerida |
-| **PUT** | `/api/therapists/specializations/{id}/` | Actualizar especialidad | Requerida |
-| **PATCH** | `/api/therapists/specializations/{id}/` | Actualizar parcialmente | Requerida |
-| **DELETE** | `/api/therapists/specializations/{id}/` | Eliminar especialidad | Requerida |
-
-#### Ejemplos de Especialidades
-
-**Crear Especialidad:**
-- **Método:** POST
-- **URL:** `{{base_url}}/api/therapists/specializations/`
-- **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
-- **Headers:**
-  ```
-  Content-Type: application/json
-  ```
-- **Body (raw JSON):**
-  ```json
-  {
-    "name": "Fisioterapia Deportiva",
-    "description": "Especialidad en rehabilitación deportiva",
-    "is_active": true
-  }
-  ```
-
-**Respuesta:**
-```json
-{
-  "id": 1,
-  "name": "Fisioterapia Deportiva",
-  "description": "Especialidad en rehabilitación deportiva",
-  "is_active": true,
-  "created_at": "2025-08-21T16:30:00Z"
-}
-```
-
-**Actualizar Especialidad:**
-- **Método:** PUT
-- **URL:** `{{base_url}}/api/therapists/specializations/1/`
-- **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
-- **Headers:**
-  ```
-  Content-Type: application/json
-  ```
-- **Body (raw JSON):**
-  ```json
-  {
-    "name": "Fisioterapia Deportiva - Actualizada",
-    "description": "Especialidad en rehabilitación deportiva y medicina del deporte. Incluye tratamiento de lesiones deportivas y prevención de lesiones.",
-    "is_active": true
-  }
-  ```
-
-**Respuesta Exitosa:**
-```json
-{
-  "id": 1,
-  "name": "Fisioterapia Deportiva - Actualizada",
-  "description": "Especialidad en rehabilitación deportiva y medicina del deporte. Incluye tratamiento de lesiones deportivas y prevención de lesiones.",
-  "is_active": true,
-  "created_at": "2025-08-21T16:30:00Z",
-  "updated_at": "2025-08-21T19:30:00Z"
-}
-```
-
-**Posibles Errores de Actualización:**
-```json
-{
-  "name": [
-    "Este campo es requerido."
-  ]
-}
-```
-```json
-{
-  "name": [
-    "Ya existe una especialidad con este nombre."
-  ]
-}
-```
-```json
-{
-  "description": [
-    "La descripción no puede estar vacía."
-  ]
-}
-```
-
-### Ubicaciones Geográficas
-
-#### Regiones
-| Método | Endpoint | Descripción | Autenticación |
-|--------|----------|-------------|---------------|
-| **GET** | `/api/therapists/regions/` | Listar regiones | No requerida |
-| **GET** | `/api/therapists/regions/{id}/` | Ver región específica | No requerida |
-
-#### Provincias
-| Método | Endpoint | Descripción | Autenticación |
-|--------|----------|-------------|---------------|
-| **GET** | `/api/therapists/provinces/` | Listar provincias | No requerida |
-| **GET** | `/api/therapists/provinces/{id}/` | Ver provincia | No requerida |
-
-#### Distritos
-| Método | Endpoint | Descripción | Autenticación |
-|--------|----------|-------------|---------------|
-| **GET** | `/api/therapists/districts/` | Listar distritos | No requerida |
-| **GET** | `/api/therapists/districts/{id}/` | Ver distrito | No requerida |
-
-#### Ejemplos de Ubicaciones
-
-**Listar Regiones (sin autenticación):**
-- **Método:** GET
-- **URL:** `{{base_url}}/api/therapists/regions/`
-- **Auth:** No requerida
-
-**Respuesta:**
-```json
-[
-  {
-    "id": 1,
-    "name": "Lima",
-    "ubigeo_code": "15"
-  },
-  {
-    "id": 2,
-    "name": "Arequipa",
-    "ubigeo_code": "04"
-  }
-]
-```
-
-**Filtrar Provincias por Región:**
-- **Método:** GET
-- **URL:** `{{base_url}}/api/therapists/provinces/?region=1`
-- **Auth:** No requerida
-
-**Filtrar Distritos por Provincia:**
-- **Método:** GET
-- **URL:** `{{base_url}}/api/therapists/districts/?province=1`
-- **Auth:** No requerida
-
----
-
 ## 📅 Módulo 5: Citas y Estados (`/api/appointments/`)
 
 ### Estados de Citas
@@ -1305,65 +1582,51 @@ Body: (vacío)
 | **GET** | `/api/appointments/appointment-statuses/{id}/` | Ver estado específico | Requerida |
 | **PUT** | `/api/appointments/appointment-statuses/{id}/` | Actualizar estado | Requerida |
 | **DELETE** | `/api/appointments/appointment-statuses/{id}/` | Eliminar estado | Requerida |
-| **GET** | `/api/appointments/appointment-statuses/active/` | Estados activos | Requerida |
-| **POST** | `/api/appointments/appointment-statuses/{id}/activate/` | Activar estado | Requerida |
-| **POST** | `/api/appointments/appointment-statuses/{id}/deactivate/` | Desactivar estado | Requerida |
-| **GET** | `/api/appointments/appointment-statuses/{id}/appointments/` | Citas por estado | Requerida |
 
 #### Ejemplos de Estados de Citas
 
 **Listar Estados de Citas:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** GET
 - **URL:** `{{base_url}}/api/appointments/appointment-statuses/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 
 **Respuesta:**
 ```json
 {
-  "count": 4,
-  "next": null,
-  "previous": null,
-  "results": [
-    {
-      "id": 1,
-      "name": "Pendiente",
-      "description": "Cita programada pero no confirmada",
-      "is_active": true,
-      "created_at": "2025-08-21T10:00:00Z"
-    },
-    {
-      "id": 2,
-      "name": "Confirmada",
-      "description": "Cita confirmada por el paciente",
-      "is_active": true,
-      "created_at": "2025-08-21T10:00:00Z"
-    },
-    {
-      "id": 3,
-      "name": "Completada",
-      "description": "Cita completada exitosamente",
-      "is_active": true,
-      "created_at": "2025-08-21T10:00:00Z"
-    },
-    {
-      "id": 4,
-      "name": "Cancelada",
-      "description": "Cita cancelada",
-      "is_active": true,
-      "created_at": "2025-08-21T10:00:00Z"
-    }
-  ]
+    "count": 2,
+    "next": null,
+    "previous": null,
+    "results": [
+        {
+            "id": 2,
+            "name": "En espera",
+            "description": "En espera",
+            "created_at": "2025-09-04T19:42:06.608348Z",
+            "updated_at": "2025-09-04T19:42:06.608375Z",
+            "deleted_at": null
+        },
+        {
+            "id": 1,
+            "name": "En Proceso",
+            "description": "Cita en proceso de atención",
+            "created_at": "2025-09-04T15:14:20.142404Z",
+            "updated_at": "2025-09-04T15:14:20.142436Z",
+            "deleted_at": null
+        }
+    ]
 }
 ```
 
 **Crear Nuevo Estado:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** POST
 - **URL:** `{{base_url}}/api/appointments/appointment-statuses/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -1371,25 +1634,30 @@ Body: (vacío)
 - **Body (raw JSON):**
   ```json
   {
-    "name": "En Proceso",
-    "description": "Cita en proceso de atención",
-    "is_active": true
+    "name": "Completada",
+    "description": "La cita fue atendida"
   }
   ```
 
-**Filtrar Estados Activos:**
-- **Método:** GET
-- **URL:** `{{base_url}}/api/appointments/appointment-statuses/?is_active=true`
-- **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  **Respuesta Exitosa**
+    ```json
+  {
+    "id": 5,
+    "name": "Completada",
+    "description": "La cita fue atendida",
+    "created_at": "2025-09-07T15:03:43.955258Z",
+    "updated_at": "2025-09-07T15:03:43.955284Z",
+    "deleted_at": null
+  }
+  ```
 
 **Actualizar Estado de Cita:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** PUT
 - **URL:** `{{base_url}}/api/appointments/appointment-statuses/1/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -1397,21 +1665,20 @@ Body: (vacío)
 - **Body (raw JSON):**
   ```json
   {
-    "name": "Pendiente - Actualizado",
-    "description": "Cita programada pero no confirmada. Estado actualizado con nueva información.",
-    "is_active": true
+    "name": "Completadaa",
+    "description": "La cita fue atendida exitosamente"
   }
   ```
 
 **Respuesta Exitosa:**
 ```json
 {
-  "id": 1,
-  "name": "Pendiente - Actualizado",
-  "description": "Cita programada pero no confirmada. Estado actualizado con nueva información.",
-  "is_active": true,
-  "created_at": "2025-08-21T10:00:00Z",
-  "updated_at": "2025-08-21T19:30:00Z"
+    "id": 1,
+    "name": "Completadaa",
+    "description": "La cita fue atendida exitosamente",
+    "created_at": "2025-09-04T15:14:20.142404Z",
+    "updated_at": "2025-09-07T15:06:03.357937Z",
+    "deleted_at": null
 }
 ```
 
@@ -1438,51 +1705,6 @@ Body: (vacío)
 }
 ```
 
-**Activar Estado:**
-- **Método:** POST
-- **URL:** `{{base_url}}/api/appointments/appointment-statuses/5/activate/`
-- **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
-- **Headers:**
-  ```
-  Content-Type: application/json
-  ```
-- **Body (raw JSON):**
-  ```json
-  {}
-  ```
-
-**Respuesta Exitosa:**
-```json
-{
-  "id": 5,
-  "name": "En Proceso",
-  "description": "Cita en proceso de atención",
-  "is_active": true,
-  "created_at": "2025-08-21T10:00:00Z",
-  "updated_at": "2025-08-21T19:30:00Z"
-}
-```
-
-**Posibles Errores:**
-```json
-{
-  "detail": "El estado ya está activo."
-}
-```
-```json
-{
-  "detail": "Estado no encontrado."
-}
-```
-
-**Nota Importante sobre Activación:**
-- **Solo funciona** con estados que están inactivos (`is_active: false`)
-- **No requiere datos** en el body, solo el ID en la URL
-- **Cambia `is_active`** de `false` a `true`
-- **Mantiene** todos los datos originales del estado
-
 ### Citas
 | Método | Endpoint | Descripción | Autenticación |
 |--------|----------|-------------|---------------|
@@ -1498,11 +1720,12 @@ Body: (vacío)
 #### Ejemplos de Citas
 
 **Crear Cita:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** POST
 - **URL:** `{{base_url}}/api/appointments/appointments/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -1510,80 +1733,53 @@ Body: (vacío)
 - **Body (raw JSON):**
   ```json
   {
-    "patient": 1,
-    "therapist": 1,
-    "appointment_date": "2025-08-25",
-    "appointment_hour": "14:30:00",
-    "appointment_status": 3,
-    "appointment_type": "Fisioterapia",
-    "room": "Sala 1",
-    "ailments": "Dolor lumbar",
-    "diagnosis": "Lumbalgia",
-    "observation": "Paciente con dolor crónico"
+  "history": 3,
+  "patient": 3,
+  "therapist": 1,
+  "appointment_date": "2025-09-10",
+  "hour": "14:38:00",
+  "appointment_type": 2,
+  "room": 1,
+  "social_benefit": true
   }
+
   ```
 
 **Respuesta Exitosa:**
 ```json
 {
-  "id": 1,
-  "patient": {
     "id": 1,
-    "first_name": "María",
-    "last_name": "González"
-  },
-  "therapist": {
-    "id": 1,
-    "first_name": "Ana",
-    "last_name_paternal": "García"
-  },
-  "appointment_date": "2025-08-25",
-  "appointment_hour": "14:30:00",
-  "appointment_status": {
-    "id": 1,
-    "name": "Pendiente"
-  },
-  "appointment_type": "Fisioterapia",
-  "room": "Sala 1",
-  "ailments": "Dolor lumbar",
-  "diagnosis": "Lumbalgia",
-  "observation": "Paciente con dolor crónico",
-  "is_active": true,
-  "created_at": "2025-08-21T17:00:00Z"
-}
-```
-
-**Ejemplos Adicionales de Citas:**
-
-**Ejemplo 2:**
-```json
-{
-  "patient": 2,
-  "therapist": 1,
-  "appointment_date": "2025-08-26",
-  "appointment_hour": "10:00:00",
-  "appointment_status": 4,
-  "appointment_type": "Terapia Física",
-  "room": "Sala 2",
-  "ailments": "Lesión de rodilla",
-  "diagnosis": "Esguince grado 1",
-  "observation": "Paciente con dolor al caminar"
-}
-```
-
-**Ejemplo 3:**
-```json
-{
-  "patient": 3,
-  "therapist": 2,
-  "appointment_date": "2025-08-27",
-  "appointment_hour": "16:00:00",
-  "appointment_status": 5,
-  "appointment_type": "Rehabilitación",
-  "room": "Sala 3",
-  "ailments": "Dolor de hombro",
-  "diagnosis": "Tendinitis",
-  "observation": "Paciente con limitación de movimiento"
+    "history": 3,
+    "patient": 3,
+    "patient_name": "Pruea3 Pruea3 Pruea3 Pruea3",
+    "therapist": 1,
+    "therapist_name": "Christhoper Sosa Morales",
+    "appointment_date": "2025-09-10T00:00:00Z",
+    "hour": "14:38:00",
+    "ailments": null,
+    "diagnosis": null,
+    "surgeries": null,
+    "reflexology_diagnostics": null,
+    "medications": null,
+    "observation": null,
+    "initial_date": null,
+    "final_date": null,
+    "appointment_type": "2",
+    "room": 1,
+    "social_benefit": true,
+    "payment_detail": null,
+    "payment": null,
+    "payment_type": null,
+    "payment_type_name": null,
+    "payment_status": null,
+    "payment_status_name": null,
+    "ticket_number": null,
+    "appointment_status": "PENDIENTE",
+    "is_completed": false,
+    "is_pending": true,
+    "created_at": "2025-09-07T15:52:01.780503Z",
+    "updated_at": "2025-09-07T15:52:01.780515Z",
+    "deleted_at": null
 }
 ```
 
@@ -1598,13 +1794,6 @@ Body: (vacío)
   ]
 }
 ```
-
-**Nota Importante sobre Estados de Cita:**
-Los IDs de estados de cita disponibles en tu base de datos son:
-- **ID: 2** - Confirmada (Activo: False)
-- **ID: 3** - Completada (Activo: True) 
-- **ID: 4** - En espera (Activo: True)
-- **ID: 5** - En Proceso (Activo: True)
 
 **❌ NO existe un estado con ID: 1**
 ```json
@@ -1637,11 +1826,12 @@ Los IDs de estados de cita disponibles en tu base de datos son:
 ```
 
 **Actualizar Cita Específica:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** PUT
 - **URL:** `{{base_url}}/api/appointments/appointments/1/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -1649,47 +1839,51 @@ Los IDs de estados de cita disponibles en tu base de datos son:
 - **Body (raw JSON):**
   ```json
   {
-    "patient": 1,
-    "therapist": 1,
-    "appointment_date": "2025-08-26",
-    "appointment_hour": "15:00:00",
-    "appointment_status": 4,
-    "appointment_type": "Fisioterapia - Actualizada",
-    "room": "Sala 2",
-    "ailments": "Dolor lumbar crónico",
-    "diagnosis": "Lumbalgia aguda",
-    "observation": "Paciente con dolor crónico. Se actualizó el tipo de cita y la sala."
+  "appointment_date": "2025-09-10",
+  "hour": "14:38:00",
+  "appointment_type": 2,
+  "room": 2,
+  "social_benefit": true
   }
+
   ```
 
 **Respuesta Exitosa:**
 ```json
 {
-  "id": 1,
-  "patient": {
-    "id": 1,
-    "first_name": "María",
-    "last_name": "González"
-  },
-  "therapist": {
-    "id": 1,
-    "first_name": "Ana",
-    "last_name_paternal": "García"
-  },
-  "appointment_date": "2025-08-26",
-  "appointment_hour": "15:00:00",
-  "appointment_status": {
-    "id": 4,
-    "name": "En espera"
-  },
-  "appointment_type": "Fisioterapia - Actualizada",
-  "room": "Sala 2",
-  "ailments": "Dolor lumbar crónico",
-  "diagnosis": "Lumbalgia aguda",
-  "observation": "Paciente con dolor crónico. Se actualizó el tipo de cita y la sala.",
-  "is_active": true,
-  "created_at": "2025-08-21T17:00:00Z",
-  "updated_at": "2025-08-21T19:30:00Z"
+    "message": "Cita actualizada exitosamente",
+    "appointment": {
+        "id": 1,
+        "history": 3,
+        "patient": 3,
+        "patient_name": "Pruea3 Pruea3 Pruea3 Pruea3",
+        "therapist": 1,
+        "therapist_name": "Christhoper Sosa Morales",
+        "appointment_date": "2025-09-10",
+        "hour": "14:38:00",
+        "ailments": null,
+        "diagnosis": null,
+        "surgeries": null,
+        "reflexology_diagnostics": null,
+        "medications": null,
+        "observation": null,
+        "initial_date": null,
+        "final_date": null,
+        "appointment_type": "2",
+        "room": 2,
+        "social_benefit": true,
+        "payment_detail": null,
+        "payment": null,
+        "payment_type": null,
+        "payment_type_name": null,
+        "payment_status": null,
+        "payment_status_name": null,
+        "ticket_number": "TKT-001",
+        "appointment_status": "PENDIENTE",
+        "created_at": "2025-09-07T15:52:01.780503Z",
+        "updated_at": "2025-09-07T15:55:49.788400Z",
+        "deleted_at": null
+    }
 }
 ```
 
@@ -1724,56 +1918,70 @@ Los IDs de estados de cita disponibles en tu base de datos son:
 ```
 
 **Filtrar Citas por Fecha:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** GET
-- **URL:** `{{base_url}}/api/appointments/appointments/?appointment_date=2025-08-25`
+- **URL:** `{{base_url}}/api/appointments/appointments/?appointment_date=2025-09-10`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 
 **Obtener Citas Completadas:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** GET
 - **URL:** `{{base_url}}/api/appointments/appointments/completed/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 
 **Citas por Rango de Fechas:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** GET
-- **URL:** `{{base_url}}/api/appointments/appointments/by_date_range/?start_date=2025-08-20&end_date=2025-08-30`
+- **URL:** `{{base_url}}/api/appointments/appointments/by_date_range/?start_date=2025-08-20&end_date=2025-09-10`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 
 **Respuesta Exitosa:**
 ```json
-[
-  {
-    "id": 1,
-    "patient": {
-      "id": 1,
-      "first_name": "María",
-      "last_name": "González"
-    },
-    "therapist": {
-      "id": 1,
-      "first_name": "Ana",
-      "last_name_paternal": "García"
-    },
-    "appointment_date": "2025-08-25",
-    "appointment_hour": "14:30:00",
-    "appointment_status": {
-      "id": 3,
-      "name": "Completada"
-    },
-    "appointment_type": "Fisioterapia",
-    "room": "Sala 1",
-    "ailments": "Dolor lumbar",
-    "diagnosis": "Lumbalgia",
-    "observation": "Paciente con dolor crónico",
-    "is_active": true,
-    "created_at": "2025-08-21T17:00:00Z"
-  }
-]
+{
+    "count": 1,
+    "results": [
+        {
+            "id": 1,
+            "history": 3,
+            "patient": 3,
+            "patient_name": "Pruea3 Pruea3 Pruea3 Pruea3",
+            "therapist": 1,
+            "therapist_name": "Christhoper Sosa Morales",
+            "appointment_date": "2025-09-10T00:00:00Z",
+            "hour": "14:38:00",
+            "ailments": null,
+            "diagnosis": null,
+            "surgeries": null,
+            "reflexology_diagnostics": null,
+            "medications": null,
+            "observation": null,
+            "initial_date": null,
+            "final_date": null,
+            "appointment_type": "2",
+            "room": 2,
+            "social_benefit": true,
+            "payment_detail": null,
+            "payment": null,
+            "payment_type": null,
+            "payment_type_name": null,
+            "payment_status": null,
+            "payment_status_name": null,
+            "ticket_number": "TKT-001",
+            "appointment_status": "PENDIENTE",
+            "is_completed": false,
+            "is_pending": true,
+            "created_at": "2025-09-07T15:52:01.780503Z",
+            "updated_at": "2025-09-07T15:55:49.788400Z",
+            "deleted_at": null
+        }
+    ]
+}
 ```
 
 **Posibles Errores:**
@@ -1806,7 +2014,6 @@ Los IDs de estados de cita disponibles en tu base de datos son:
 | Método | Endpoint | Descripción | Autenticación |
 |--------|----------|-------------|---------------|
 | **GET** | `/api/appointments/tickets/` | Listar tickets | Requerida |
-| **POST** | `/api/appointments/tickets/` | Crear ticket | Requerida |
 | **GET** | `/api/appointments/tickets/{id}/` | Ver ticket específico | Requerida |
 | **PUT** | `/api/appointments/tickets/{id}/` | Actualizar ticket | Requerida |
 | **DELETE** | `/api/appointments/tickets/{id}/` | Eliminar ticket | Requerida |
@@ -1818,134 +2025,64 @@ Los IDs de estados de cita disponibles en tu base de datos son:
 
 #### Ejemplos de Tickets
 
-**Crear Ticket:**
-- **Método:** POST
-- **URL:** `{{base_url}}/api/appointments/tickets/`
-- **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
-- **Headers:**
-  ```
-  Content-Type: application/json
-  ```
-- **Body (raw JSON):**
-  ```json
-  {
-    "appointment": 3,
-    "ticket_number": "TKT-001",
-    "amount": 150.00,
-    "payment_method": "Efectivo",
-    "description": "Sesión de fisioterapia",
-    "status": "pending"
-  }
-  ```
-
-**Respuesta Exitosa:**
-```json
-{
-  "id": 1,
-  "appointment": {
-    "id": 3,
-    "appointment_date": "2025-08-25"
-  },
-  "ticket_number": "TKT-001",
-  "amount": "150.00",
-  "payment_method": "Efectivo",
-  "description": "Sesión de fisioterapia",
-  "status": "pending",
-  "payment_date": null,
-  "is_active": true,
-  "created_at": "2025-08-21T17:30:00Z"
-}
-```
-
-**Ejemplos Adicionales de Tickets:**
-
-**Ejemplo 2:**
-```json
-{
-  "appointment": 2,
-  "ticket_number": "TKT-002",
-  "amount": 200.00,
-  "payment_method": "Tarjeta",
-  "description": "Terapia física para lesión de rodilla",
-  "status": "paid"
-}
-```
-
-**Ejemplo 3:**
-```json
-{
-  "appointment": 3,
-  "ticket_number": "TKT-003",
-  "amount": 180.00,
-  "payment_method": "Transferencia",
-  "description": "Rehabilitación para dolor de hombro",
-  "status": "pending"
-}
-```
-
 **📋 Ejemplo Completo - Crear Cita y Ticket:**
 
 **Paso 1: Crear Cita**
+- **Base URL:** `http://178.156.204.38/`
 ```json
 POST {{base_url}}/api/appointments/appointments/
-{
-  "patient": 1,
+  {
+  "history": 3,
+  "patient": 3,
   "therapist": 1,
-  "appointment_date": "2025-08-25",
-  "appointment_hour": "14:30:00",
-  "appointment_status": 3,
-  "appointment_type": "Fisioterapia",
-  "room": "Sala 1",
-  "ailments": "Dolor lumbar",
-  "diagnosis": "Lumbalgia",
-  "observation": "Paciente con dolor crónico"
-}
+  "appointment_date": "2025-09-10",
+  "hour": "14:38:00",
+  "appointment_type": 2,
+  "room": 1,
+  "social_benefit": true
+  }
 ```
 
 **Respuesta de Cita Creada:**
 ```json
 {
-  "id": 1,
-  "patient": {
     "id": 1,
-    "first_name": "María",
-    "last_name": "González"
-  },
-  "therapist": {
-    "id": 1,
-    "first_name": "Ana",
-    "last_name_paternal": "García"
-  },
-  "appointment_date": "2025-08-25",
-  "appointment_hour": "14:30:00",
-  "appointment_status": {
-    "id": 3,
-    "name": "Completada"
-  },
-  "appointment_type": "Fisioterapia",
-  "room": "Sala 1",
-  "ailments": "Dolor lumbar",
-  "diagnosis": "Lumbalgia",
-  "observation": "Paciente con dolor crónico",
-  "is_active": true,
-  "created_at": "2025-08-21T17:00:00Z"
+    "history": 3,
+    "patient": 3,
+    "patient_name": "Pruea3 Pruea3 Pruea3 Pruea3",
+    "therapist": 1,
+    "therapist_name": "Christhoper Sosa Morales",
+    "appointment_date": "2025-09-10T00:00:00Z",
+    "hour": "14:38:00",
+    "ailments": null,
+    "diagnosis": null,
+    "surgeries": null,
+    "reflexology_diagnostics": null,
+    "medications": null,
+    "observation": null,
+    "initial_date": null,
+    "final_date": null,
+    "appointment_type": "2",
+    "room": 1,
+    "social_benefit": true,
+    "payment_detail": null,
+    "payment": null,
+    "payment_type": null,
+    "payment_type_name": null,
+    "payment_status": null,
+    "payment_status_name": null,
+    "ticket_number": null,
+    "appointment_status": "PENDIENTE",
+    "is_completed": false,
+    "is_pending": true,
+    "created_at": "2025-09-07T15:52:01.780503Z",
+    "updated_at": "2025-09-07T15:52:01.780515Z",
+    "deleted_at": null
 }
 ```
 
-**Paso 2: Crear Ticket (usando ID de cita = 3)**
-```json
-POST {{base_url}}/api/appointments/tickets/
-{
-  "appointment": 3,
-  "ticket_number": "TKT-001",
-  "amount": 150.00,
-  "payment_method": "Efectivo",
-  "description": "Sesión de fisioterapia",
-  "status": "pending"
-}
-```
+**NOTA IMPORTANTE:**
+- **Al crear una cita, se crea automaticamente su ticket**
 
 **Posibles Errores de Validación:**
 ```json
@@ -2010,28 +2147,21 @@ POST {{base_url}}/api/appointments/tickets/
 - **`description`**: Descripción opcional del servicio
 
 **⚠️ IMPORTANTE - Crear Cita Primero:**
-Antes de crear un ticket, **DEBES crear una cita primero**. Los IDs disponibles son:
-- **Pacientes**: ID 1, 2, 3, 4
-- **Terapeutas**: ID 1, 2
-- **Estados de cita**: ID 2, 3, 4, 5
-
-**Cita existente en tu base de datos:**
-- **ID: 3** - María Elena González López (Fecha: 2025-08-25, Estado: Completada)
+**DEBES crear una cita primero**. Los IDs disponibles son:
+- **Pacientes**: ID 3
+- **Terapeutas**: ID 1
+- **Estados de cita**: **DEFAULT**
 
 **Pasos para crear un ticket:**
-1. **Crear cita**: POST `/api/appointments/appointments/` con datos válidos
-2. **Obtener ID de cita**: De la respuesta de la cita creada
-3. **Crear ticket**: POST `/api/appointments/tickets/` usando el ID de cita obtenido
-
-**Para usar la cita existente:**
-Usa `"appointment": 3` en lugar de `"appointment": 1`
+1. **Crear cita**: POST `/api/appointments/appointments/` con datos válidos y automaticamentee se crea su ticket
 
 **Marcar Ticket como Pagado:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** POST
 - **URL:** `{{base_url}}/api/appointments/tickets/1/mark_as_paid/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -2044,20 +2174,23 @@ Usa `"appointment": 3` en lugar de `"appointment": 1`
 **Respuesta Exitosa:**
 ```json
 {
-  "id": 1,
-  "appointment": {
-    "id": 3,
-    "appointment_date": "2025-08-25"
-  },
-  "ticket_number": "TKT-001",
-  "amount": "150.00",
-  "payment_method": "Efectivo",
-  "description": "Sesión de fisioterapia",
-  "status": "paid",
-  "payment_date": "2025-08-21T20:00:00Z",
-  "is_active": true,
-  "created_at": "2025-08-21T17:30:00Z",
-  "updated_at": "2025-08-21T20:00:00Z"
+    "message": "Ticket marcado como pagado exitosamente",
+    "ticket": {
+        "id": 1,
+        "appointment": 1,
+        "appointment_details": "Cita 1 - 2025-09-10 00:00:00+00:00 14:38:00",
+        "ticket_number": "TKT-001",
+        "payment_date": "2025-09-07T15:52:01.785981Z",
+        "amount": "0.00",
+        "payment_method": "efectivo",
+        "description": "Ticket generado automáticamente para cita #1",
+        "status": "paid",
+        "is_paid": true,
+        "is_pending": false,
+        "created_at": "2025-09-07T15:52:01.786036Z",
+        "updated_at": "2025-09-07T16:05:22.856706Z",
+        "deleted_at": null
+    }
 }
 ```
 
@@ -2086,20 +2219,17 @@ Usa `"appointment": 3` en lugar de `"appointment": 1`
 - **Mantiene** todos los demás datos del ticket
 
 **⚠️ IMPORTANTE - Crear Ticket Primero:**
-Antes de marcar un ticket como pagado, **DEBES crear un ticket primero**. Los pasos son:
+Antes de marcar un ticket como pagado, **DEBES crear una cita primero**. Los pasos son:
 1. **Crear cita**: POST `/api/appointments/appointments/` con datos válidos
-2. **Crear ticket**: POST `/api/appointments/tickets/` usando el ID de cita obtenido
-3. **Marcar como pagado**: POST `/api/appointments/tickets/{id}/mark_as_paid/` usando el ID del ticket creado
-
-**Para usar la cita existente:**
-Usa `"appointment": 3` en el ticket (ID de la cita existente)
+2. **Marcar como pagado**: POST `/api/appointments/tickets/{id}/mark_as_paid/` usando el ID del ticket creado
 
 **Actualizar Ticket Específico:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** PUT
 - **URL:** `{{base_url}}/api/appointments/tickets/1/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -2107,11 +2237,7 @@ Usa `"appointment": 3` en el ticket (ID de la cita existente)
 - **Body (raw JSON):**
   ```json
   {
-    "appointment": 3,
-    "ticket_number": "TKT-001-ACTUALIZADO",
     "amount": 180.00,
-    "payment_method": "Tarjeta",
-    "description": "Sesión de fisioterapia - Actualizada con nueva información",
     "status": "paid"
   }
   ```
@@ -2119,20 +2245,23 @@ Usa `"appointment": 3` en el ticket (ID de la cita existente)
 **Respuesta Exitosa:**
 ```json
 {
-  "id": 1,
-  "appointment": {
-    "id": 3,
-    "appointment_date": "2025-08-25"
-  },
-  "ticket_number": "TKT-001-ACTUALIZADO",
-  "amount": "180.00",
-  "payment_method": "Tarjeta",
-  "description": "Sesión de fisioterapia - Actualizada con nueva información",
-  "status": "paid",
-  "payment_date": "2025-08-21T20:00:00Z",
-  "is_active": true,
-  "created_at": "2025-08-21T17:30:00Z",
-  "updated_at": "2025-08-21T20:00:00Z"
+    "message": "Ticket actualizado exitosamente",
+    "ticket": {
+        "id": 1,
+        "appointment": 1,
+        "appointment_details": "Cita 1 - 2025-09-10 00:00:00+00:00 14:38:00",
+        "ticket_number": "TKT-001",
+        "payment_date": "2025-09-07T15:52:01.785981Z",
+        "amount": "180.00",
+        "payment_method": "efectivo",
+        "description": "Ticket generado automáticamente para cita #1",
+        "status": "paid",
+        "is_paid": true,
+        "is_pending": false,
+        "created_at": "2025-09-07T15:52:01.786036Z",
+        "updated_at": "2025-09-07T16:07:50.757060Z",
+        "deleted_at": null
+    }
 }
 ```
 
@@ -2174,20 +2303,17 @@ Usa `"appointment": 3` en el ticket (ID de la cita existente)
 ```
 
 **Nota Importante sobre Actualización de Tickets:**
-- **`appointment`**: ID de la cita (debe existir)
-- **`ticket_number`**: Número único del ticket (no puede duplicarse)
 - **`amount`**: Monto en decimal (debe ser mayor a 0)
 - **`payment_method`**: Método de pago válido
 - **`status`**: Estado válido (pending, paid, cancelled)
-- **`description`**: Descripción opcional del servicio
-- **`payment_date`**: Se actualiza automáticamente cuando el status cambia a "paid"
 
 **Filtrar Tickets por Estado:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** GET
-- **URL:** `{{base_url}}/api/appointments/tickets/?status=pending`
+- **URL:** `{{base_url}}/api/appointments/tickets/?status=paid`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 
 ---
 
@@ -2203,11 +2329,12 @@ Usa `"appointment": 3` en el ticket (ID de la cita existente)
 #### Ejemplos de Historiales
 
 **Crear Historial:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** POST
 - **URL:** `{{base_url}}/api/configurations/histories/create/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -2215,50 +2342,18 @@ Usa `"appointment": 3` en el ticket (ID de la cita existente)
 - **Body (raw JSON):**
   ```json
   {
-    "document_type": 1,
-    "document_number": "12345678"
+    "patient": 3,
+    "patient_name": "Pruea3 Pruea3 Pruea3"
   }
   ```
 
 **Respuesta Exitosa:**
 ```json
-{
-  "id": 1
-}
-```
-
-**Ejemplos Adicionales de Historiales:**
-
-**Ejemplo 2:**
-```json
-{
-  "document_type": 1,
-  "document_number": "87654321"
-}
-```
-
-**Ejemplo 3:**
-```json
-{
-  "document_type": 1,
-  "document_number": "11111111"
-}
-```
-
-**Ejemplo 4:**
-```json
-{
-  "document_type": 1,
-  "document_number": "99999999"
-}
-```
-
-**Ejemplo 5:**
-```json
-{
-  "document_type": 1,
-  "document_number": "55555555"
-}
+  {
+    "id": 3,
+    "patient": 3,
+    "patient_name": "Pruea3 Pruea3 Pruea3"
+  }
 ```
 
 **Posibles Errores de Validación:**
@@ -2272,39 +2367,14 @@ Usa `"appointment": 3` en el ticket (ID de la cita existente)
   "error": "JSON inválido"
 }
 ```
-```json
-{
-  "error": "document_type inválido"
-}
-```
-```json
-{
-  "error": "Ya existe un historial activo con este tipo de documento y número",
-  "existing_history_id": 1
-}
-```
-
-**Nota Importante sobre Historiales:**
-- **`document_type`**: ID del tipo de documento (debe existir)
-- **`document_number`**: Número del documento (obligatorio)
-
-**⚠️ IMPORTANTE - Tipos de Documento Disponibles:**
-- **ID: 1** - DNI (Documento Nacional de Identidad)
-
-**Nota sobre el Modelo History:**
-Este endpoint crea un historial básico con solo tipo de documento y número. Los campos adicionales como `testimony`, `observation`, `height`, `weight`, etc. se pueden actualizar posteriormente si es necesario.
-
-**⚠️ RESTRICCIÓN ÚNICA IMPORTANTE:**
-- No puede existir más de un historial activo con la misma combinación de `document_type` y `document_number`
-- Si intentas crear un historial con una combinación que ya existe, recibirás un error 409 (Conflict)
-- Para reutilizar una combinación, primero debes eliminar (soft delete) el historial existente
 
 **Eliminar Historial:**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** POST
 - **URL:** `{{base_url}}/api/configurations/histories/2/delete/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -2333,31 +2403,6 @@ Este endpoint crea un historial básico con solo tipo de documento y número. Lo
 - **Soft Delete**: Marca el historial como eliminado (`deleted_at = now()`) pero no lo borra físicamente
 - **Body vacío**: No requiere datos en el body, solo el ID en la URL
 - **Reutilización**: Después de eliminar, puedes crear un nuevo historial con la misma combinación de documento
-
----
-
-## 🔐 Autenticación
-
-### Credenciales de Prueba
-```
-Username: xxangelx31@gmail.com
-Password: edu123
-```
-
-### Métodos de Autenticación
-1. **Basic Auth** (Recomendado para pruebas)
-   - En Postman: Authorization tab → Basic Auth
-   - Username: `xxangelx31@gmail.com`
-   - Password: `edu123`
-   
-2. **Session Auth** (Para navegador)
-   - Login en: `http://localhost:8000/admin/`
-
-### Configuración en Postman
-1. **Authorization tab** → **Basic Auth**
-2. **Username:** `xxangelx31@gmail.com`
-3. **Password:** `edu123`
-4. **URL:** `{{base_url}}/api/appointments/appointment-statuses/`
 
 ---
 
@@ -2427,38 +2472,30 @@ Password: edu123
 
 ### Ejemplo de Empresa
 **Crear Empresa**
-**Método**:POST
-**URL**: `{{base_url}}/api/company/company/`
--**Auth**: Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+- **Base URL:** `http://178.156.204.38/`
+- **Método**:POST
+- **URL**: `{{base_url}}/api/company/company/`
+- **Auth:** Basic Auth
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 -**Headers:**
 -**Body (raw):**
 ```json
 {
-  "company_name": "Reflexo"
+    "company_name": "prueba12"
 }
 ```
 
 **Respuesta Exitosa:**
 ```json
-{  
-  "id": 1,
-  "company_name": "Reflexo",
-  "company_logo": null,
-  "logo_url": null,
-  "has_logo": false,
-  "created_at": "2025-08-24T04:15:38.320819Z",
-  "updated_at": "2025-08-24T04:15:38.320839Z"
-}
-```
-
-**Ejemplos Adicionales de Empresa:**
-
-**Ejemplo 2:**
-```json
 {
-  "company_name": "Reflexo2"
+    "id": 4,
+    "company_name": "prueba12",
+    "company_logo": null,
+    "logo_url": null,
+    "has_logo": false,
+    "created_at": "2025-09-07T16:14:33.374603Z",
+    "updated_at": "2025-09-07T16:14:33.374631Z"
 }
 ```
 
@@ -2478,11 +2515,12 @@ se pueda crear más.
 ------------------------------------------------------------------------------
 
 **Subir Logo**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** POST
 - **URL:** `{{base_url}}/api/company/company/{id}/upload_logo/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/json
@@ -2530,11 +2568,12 @@ se pueda crear más.
 -------------------------------------------------------------------------------------------
 
 **Eliminar Empresa**
-**Método**:DELETE
-**URL**: `{{base_url}}/api/company/company/{id}`
--**Auth**: Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+- **Base URL:** `http://178.156.204.38/`
+- **Método**:DELETE
+- **URL**: `{{base_url}}/api/company/company/3/`
+- **Auth:** Basic Auth
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 -**Headers:**
 -**Body (raw):**
 
@@ -2542,7 +2581,7 @@ se pueda crear más.
 ```json
 {
     "status": "success",
-    "message": "Empresa \"REFLEXO1\" eliminada correctamente"
+    "message": "Empresa \"xd\" eliminada correctamente"
 }
 ```
 **Posibles Errores al Elimnar empresa**
@@ -2557,11 +2596,12 @@ se pueda crear más.
 -*Colocar el id correcto de la empresa creada*
 
 **Eliminar Logo**
-**Método**:DELETE
-**URL**: `{{base_url}}/api/company/company/{id}/delete_logo`
--**Auth**: Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+- **Base URL:** `http://178.156.204.38/`
+- **Método**:DELETE
+- **URL**: `{{base_url}}/api/company/company/{id}/delete_logo`
+- **Auth:** Basic Auth
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 -**Headers:**
 -**Body (raw):**
 
@@ -2585,38 +2625,40 @@ se pueda crear más.
 
 **Actualizar Empresa**
 *SOLO ACTUALIZAR EL NOMBRE*
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** PUT
-- **URL:** `{{base_url}}/api/company/company/{id}/`
+- **URL:** `{{base_url}}/api/company/company/4/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
 -**Body (raw):** 
 
 ```json
 {
-  "company_name": "empresaT"
+    "company_name": "pruebba123"
 }
 ```
 
 **Respuesta Exitosa:**
 ```json
 {
-    "id": 1,
-    "company_name": "empresaT",
-    "company_logo": "empresaT.jpg",
-    "logo_url": "http://127.0.0.1:8000/media/logos/oskar-smethurst-B1GtwanCbiw-unsplash_1.jpg",
-    "has_logo": true,
-    "created_at": "2025-08-24T16:24:25.239714Z",
-    "updated_at": "2025-08-24T16:51:54.849350Z"
+    "id": 4,
+    "company_name": "pruebba123",
+    "company_logo": null,
+    "logo_url": null,
+    "has_logo": false,
+    "created_at": "2025-09-07T16:14:33.374603Z",
+    "updated_at": "2025-09-07T16:18:32.312245Z"
 }
 ```
-*ACTUALIZAR NOMBRE Y LOGO*
+**ACTUALIZAR NOMBRE Y LOGO**
+- **Base URL:** `http://178.156.204.38/`
 - **Método:** PUT
 - **URL:** `{{base_url}}/api/company/company/{id}/`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
 - **Body (Form-data):**
   |        Key           |       Value        | 
@@ -2682,11 +2724,12 @@ se pueda crear más.
 
 ### Ejemplos de reporte de citas por terapeuta
 **Mostrar: "Reporte de cita por terapeuta":**
+- **Base URL:** `http://178.156.204.38/`
 - **Método: GET** 
-- **URL:** `{{base_url}}/api/company/reports/appointments-per-therapist/?date=2025-08-25`
+- **URL:** `{{base_url}}/api/company/reports/appointments-per-therapist/?date=2025-09-10`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/JSON
@@ -2694,17 +2737,18 @@ se pueda crear más.
 **Respuesta Exitosa:**
 ```json
 {
+    "date": "2025-09-10",
     "therapists_appointments": [
         {
             "id": 1,
-            "first_name": "Carlos",
-            "last_name_paternal": "Rodríguez",
-            "last_name_maternal": "Martínez",
-            "appointments_count": 2,
-            "percentage": 100
+            "name": "Christhoper Sosa Morales",
+            "last_name_paternal": "Sosa",
+            "last_name_maternal": "Morales",
+            "appointments_count": 1,
+            "percentage": 100.0
         }
     ],
-    "total_appointments_count": 2
+    "total_appointments_count": 1
 }
 ```
 **Nota Importante sobre Citas por terapeuta:**
@@ -2713,11 +2757,12 @@ se pueda crear más.
 
 ### Ejemplos de Reporte diario de caja
 **Mostrar: "Reporte de diario de caja":**
+- **Base URL:** `http://178.156.204.38/`
 - **Método: GET** 
 - **URL:** `{{base_url}}/api/company/reports/daily-cash/?date=2025-08-25`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/JSON
@@ -2744,11 +2789,12 @@ se pueda crear más.
 
 ### Ejemplos de Reporte de pacientes por Terapeuta
 **Mostrar: "Reporte de paciente por Terapeuta":**
+- **Base URL:** `http://178.156.204.38/`
 - **Método: GET** 
-- **URL:** `{{base_url}}/api/company/reports/patients-by-therapist/?date=2025-08-25`
+- **URL:** `{{base_url}}/api/company/reports/patients-by-therapist/?date=2025-09-10`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 - **Headers:**
   ```
   Content-Type: application/JSON
@@ -2758,16 +2804,11 @@ se pueda crear más.
 [
     {
         "therapist_id": "1",
-        "therapist": "Rodríguez Martínez Carlos",
+        "therapist": "Sosa Morales Christhoper",
         "patients": [
             {
-                "patient_id": 2,
-                "patient": "García Hernández Jose Sofía",
-                "appointments": 1
-            },
-            {
-                "patient_id": 1,
-                "patient": "García Hernández Ana Sofía",
+                "patient_id": 3,
+                "patient": "Pruea3 Pruea3 Pruea3 Pruea3",
                 "appointments": 1
             }
         ]
@@ -2781,11 +2822,12 @@ se pueda crear más.
 
 ### Ejemplos de Reporte de Citas en un rango de fechas
 **Mostrar: "Reporte citas entre fechas":**
+- **Base URL:** `http://178.156.204.38/`
 - **Método: GET** 
 - **URL:** `{{base_url}}/api/company/reports/appointments-between-dates/?start_date=2025-08-25&end_date=2025-08-28`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 
 **Respuesta Exitosa:**
 
@@ -2793,30 +2835,12 @@ se pueda crear más.
 [
     {
         "appointment_id": 1,
-        "patient_id": 1,
-        "document_number_patient": "11111111",
-        "patient": "García Hernández Ana Sofía",
-        "primary_phone_patient": "+51 444 444 444",
-        "appointment_date": "2025-08-25",
-        "appointment_hour": "14:30"
-    },
-    {
-        "appointment_id": 2,
-        "patient_id": 1,
-        "document_number_patient": "11111111",
-        "patient": "García Hernández Ana Sofía",
-        "primary_phone_patient": "+51 444 444 444",
-        "appointment_date": "2025-08-25",
-        "appointment_hour": "14:30"
-    },
-    {
-        "appointment_id": 3,
-        "patient_id": 1,
-        "document_number_patient": "11111111",
-        "patient": "García Hernández Ana Sofía",
-        "primary_phone_patient": "+51 444 444 444",
-        "appointment_date": "2025-08-25",
-        "appointment_hour": "14:30"
+        "patient_id": 3,
+        "document_number_patient": "11111333",
+        "patient": "Pruea3 Pruea3 Pruea3 Pruea3",
+        "phone1_patient": null,
+        "appointment_date": "2025-09-10",
+        "hour": "14:38"
     }
 ]
 ```
@@ -2826,8 +2850,9 @@ se pueda crear más.
 --------------------------------------------------------------
 
 **Mostrar: "Reporte citas entre fechas (EXCEL)":**
+- **Base URL:** `http://178.156.204.38/`
 - **Método: GET** 
-- **URL:** `{{base_url}}/api/company/reports/patients-by-therapist/?date=2025-08-25`
+- **URL:** `{{base_url}}http://178.156.204.38/api/company/exports/excel/citas-rango/?start_date=2025-08-25&end_date=2025-09-10`
 - **Auth:** 
 - **Headers:**
 
@@ -2856,11 +2881,12 @@ ID Paciente	DNI/Documento	Paciente	      Teléfono	      Fecha	   Hora
 
 ### Ejemplos de Estadísticas
 **Mostrar: "Estadísticas de datos":**
+- **Base URL:** `http://178.156.204.38/`
 - **Método: GET** 
 - **URL:** `{{base_url}}/api/company/reports/statistics/?start=2025-08-25&end=2025-08-28`
 - **Auth:** Basic Auth
-  - Username: `xxangelx31@gmail.com`
-  - Password: `edu123`
+  - Username: `reflexo@gmail.com`
+  - Password: `Reflexo159//`
 
 **Respuesta Exitosa:**
 ```json
@@ -2932,29 +2958,3 @@ GET /api/therapists/therapists/?region=1&active=true&search=ana
 5. **Búsqueda**: La búsqueda es case-insensitive
 6. **Fechas**: Usar formato ISO 8601 (YYYY-MM-DD)
 7. **Horas**: Usar formato 24h (HH:MM:SS)
-
----
-
-## 🚀 Uso en Desarrollo
-
-### Iniciar Servidor
-```bash
-python manage.py runserver
-```
-
-### Configuración en Postman
-1. **Importar colección**: `Backend_Reflexo_MTV_API.postman_collection.json`
-2. **Variables de entorno**:
-   - `base_url`: `http://localhost:8000`
-3. **Autenticación automática** configurada en todos los endpoints
-
-### Documentación Interactiva
-- **Admin Django**: `http://localhost:8000/admin/`
-- **Browsable API**: Disponible en todos los endpoints GET
-
-### Herramientas Recomendadas
-- **Postman**: Para pruebas de API
-- **Insomnia**: Alternativa a Postman
-- **Thunder Client**: Extensión de VS Code
-- **httpie**: Para línea de comandos (alternativa a curl)
-
