@@ -17,10 +17,11 @@ Esta carpeta contiene el código de la interfaz de usuario desarrollado en React
 ## ⚙️ Instrucciones para instalar y ejecutar
 
 1. Abre Visual Studio y carga la carpeta frontend.  
-2. Instala dependencias con npm o yarn desde la terminal integrada:  
+2. Instala dependencias con npm o yarn desde la terminal integrada:
+
 npm install
 
-3. Inicia el servidor de desarrollo React para pruebas:  
+4. Inicia el servidor de desarrollo React para pruebas:  
 
 npm start
 
