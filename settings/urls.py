@@ -29,8 +29,9 @@ def health_check(request):
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+
     path('health/', health_check, name='health_check'),
-    
+    path("api/citas/", include("appointments.urls")),  # 👈 incluye las rutas de tu app
     # 🔌 API Endpoints - Estándar unificado
     path('api/', include([
         # 🏗️ Módulo 1: Arquitectura y Usuarios Base
@@ -56,9 +57,11 @@ urlpatterns = [
 
         # 📊 Módulo 8: Reportes de Empresas
         path('company/', include('company_reports.urls')),
+        
 
     ])),
 ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

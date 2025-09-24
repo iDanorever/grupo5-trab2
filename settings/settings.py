@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     'ubi_geo.apps.UbiGeoConfig',
     'users_profiles',
     'company_reports',
+    'appointments',
 ]
 
 # Modelo de usuario personalizado
@@ -284,3 +285,7 @@ LOGGING = {
         },
     },
 }
+
+GHL_API_KEY = os.getenv("GHL_API_KEY")
+GHL_LOCATION_ID = os.getenv("GHL_LOCATION_ID")
+GHL_CALENDAR_ID = os.getenv("GHL_CALENDAR_ID")

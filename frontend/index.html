@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Crear Cita</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Crear Nueva Cita</h1>
+    <form id="citaForm">
+      <input type="text" id="title" placeholder="Título" required>
+      <input type="text" id="contactId" placeholder="Contact ID (GHL)" required>
+      <label for="startTime">Inicio:</label>
+      <input type="datetime-local" id="startTime" required>
+      <label for="endTime">Fin:</label>
+      <input type="datetime-local" id="endTime" required>
+      <textarea id="description" placeholder="Descripción"></textarea>
+      <button type="submit">Crear Cita</button>
+    </form>
+
+    <h3>Respuesta del servidor:</h3>
+    <pre id="resultado"></pre>
+  </div>
+
+  <script src="create-cita.js"></script>
+</body>
+</html>

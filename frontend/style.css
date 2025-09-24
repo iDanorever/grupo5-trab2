@@ -1,0 +1,74 @@
+/* Fondo general */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #74b9ff, #a29bfe);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+}
+
+/* Contenedor principal */
+.container {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+  width: 400px;
+  max-width: 95%;
+  text-align: center;
+}
+
+/* Títulos */
+h1 {
+  color: #2d3436;
+  margin-bottom: 20px;
+}
+
+/* Inputs y textarea */
+input, textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #dfe6e9;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+input:focus, textarea:focus {
+  outline: none;
+  border-color: #0984e3;
+}
+
+/* Botones */
+button {
+  width: 100%;
+  padding: 12px;
+  background: #0984e3;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #74b9ff;
+}
+
+/* Resultado */
+pre {
+  background: #f1f2f6;
+  text-align: left;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 20px;
+  font-size: 13px;
+  overflow-x: auto;
+}
+
