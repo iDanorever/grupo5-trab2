@@ -18,7 +18,7 @@ Esta rama contiene el desarrollo completo del **backend** del proyecto, con enfo
 ---
 
 ## 📂 Estructura de Carpetas
-
+```
 /backend
 📦 api # ⚙️ Lógica de consumo y control de la API GHL
 🗃️ models # 🏗️ Definición de modelos y bases de datos
@@ -27,7 +27,7 @@ Esta rama contiene el desarrollo completo del **backend** del proyecto, con enfo
 ⚙️ config # 🔧 Archivos de configuración del proyecto y bases de datos
 🛠️ scripts # 🔄 Scripts de automatización y utilidades
 📄 README.md # 📚 Documentación específica del backend
-undefined
+```
 
 ---
 
