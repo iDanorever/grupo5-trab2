@@ -20,7 +20,7 @@ Esta rama contiene el desarrollo completo del **backend** del proyecto, con enfo
 ## 📂 Estructura de Carpetas
 
 /backend
-📦 api # ⚙️ Lógica de consumo y control de la API GHL
+```📦 api # ⚙️ Lógica de consumo y control de la API GHL```
 🗃️ models # 🏗️ Definición de modelos y bases de datos
 🧪 tests # ✅ Pruebas unitarias y de integración
 📜 migrations # 🛠️ Archivos de migraciones Django
