@@ -1,61 +1,46 @@
-# 🚀 Documentación de la Rama Backend
+# 🌟 Rama Principal - main
 
-Esta rama contiene el desarrollo completo del **backend** del proyecto, con enfoque en la integración y consumo controlado de la API de GoHighLevel (GHL) usando **Django**. ⚙️🐍
+Esta es la rama principal del repositorio, donde se integra y conserva el código estable y listo para producción.
 
----
+***
 
-## 📚 Contenido Principal
+## 🚩 Propósito
 
-- 💻 Código fuente backend Django: modelos, vistas, urls, serializers, middlewares.  
-- 🗄️ Configuración de base de datos MySQL y archivos de conexión.  
-- ⏱️ Control y manejo de rate limits para respetar los límites de la API externa.  
-- ✅ Pruebas unitarias específicas para asegurar la estabilidad y correcto funcionamiento.  
-- 📝 Documentación técnica especializada y notas de desarrollo.  
-- 📈 Reportes de avance y resultados de las pruebas realizadas.  
-- ⚙️ Archivos de configuración para entornos de desarrollo y producción.  
-- 🛠️ Scripts para automatización y manejo de datos.  
+- Contener el código final y probado de todas las funcionalidades integradas.  
+- Servir como base para despliegues y versiones oficiales del proyecto.  
+- Consolidar el trabajo que proviene de las ramas de desarrollo (como backend, frontend, etc.).  
+- Mantener la estabilidad y calidad del código mediante revisiones y pruebas exhaustivas.  
 
----
+***
 
-## 📂 Estructura de Carpetas
+## 📦 Contenido Principal
+
+- Código backend y frontend completamente integrados y funcionales.  
+- Archivos de configuración para despliegue y producción.  
+- Documentación general del proyecto y guías para usuarios finales.  
+- Scripts y herramientas para automatización de tareas y despliegue.  
+
+***
+
+## 🗂️ Estructura General (ejemplo)
+
 ```
-/backend
-📦 api # ⚙️ Lógica de consumo y control de la API GHL
-🗃️ models # 🏗️ Definición de modelos y bases de datos
-🧪 tests # ✅ Pruebas unitarias y de integración
-📜 migrations # 🛠️ Archivos de migraciones Django
-⚙️ config # 🔧 Archivos de configuración del proyecto y bases de datos
-🛠️ scripts # 🔄 Scripts de automatización y utilidades
-📄 README.md # 📚 Documentación específica del backend
+/main
+  /backend        # Código backend integrado y probado
+  /frontend       # Código frontend con interfaces de usuario
+  /config         # Configuración global del proyecto (producción, pruebas)
+  /scripts        # Utilidades y automatizaciones variadas
+  README.md       # Documentación general del proyecto
 ```
+***
 
----
+## 🔄 Flujo de trabajo
 
-## 🧭 Navegación Rápida
+- Solo se hacen merges a **main** desde ramas con cambios aprobados y revisados.  
+- La rama se mantiene alineada con las mejores prácticas de desarrollo y pruebas.  
+- Toda modificación relevante debe contar con pruebas unitarias y de integración.  
+- Se realiza un control estricto de versiones para producción.  
 
-- `api/` contiene los módulos que manejan las interacciones con GHL y el control de rate limits.  
-- `models/` define las estructuras y relaciones de la base de datos.  
-- `tests/` agrupa todas las pruebas automatizadas para backend.  
-- `config/` aloja archivos claves para configuración local y producción.  
-- `scripts/` incluye utilidades para tareas comunes y mantenimiento.  
+***
 
----
-
-## 🔧 Guía de Trabajo
-
-- ✔️ Antes de hacer merge a **main**, todo código debe estar probado y revisado para asegurar la calidad.  
-- 📝 Utilizar mensajes de commit claros, específicos y relacionados al desarrollo backend.  
-- 📚 Actualizar la documentación y reportes con cada cambio significativo.  
-- 💬 Mantener comunicación constante en el canal oficial de backend para resolver bloqueos o dudas.  
-- 🐍 Seguir los estándares de codificación y buenas prácticas de Django y Python.  
-- 🔍 Realizar revisiones de código (code reviews) periódicas para mejorar el proyecto.  
-
----
-
-## 📞 Contacto y Soporte
-
-Para dudas técnicas, bloqueos o sugerencias, comunicarse con el responsable del backend o el Scrum Master asignado.
-
----
-
-✨ **Este documento se actualizará conforme avance el desarrollo y se agreguen mejoras al backend.** ✨
+✨ **La rama main es la referencia estable y base para todas las operaciones oficiales del proyecto.**
